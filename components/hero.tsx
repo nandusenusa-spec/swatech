@@ -216,34 +216,34 @@ const createVehicleIcon = (vehicle: VehicleLocation) => {
           ">
             ${avatarContent}
             
-            <!-- Status Indicator -->
+            <!-- Status Indicator (top right) -->
             <div style="
               position: absolute;
-              top: -4px;
-              right: -4px;
-              width: 18px;
-              height: 18px;
+              top: -2px;
+              right: -2px;
+              width: 14px;
+              height: 14px;
               background: ${statusColor};
               border-radius: 50%;
-              border: 3px solid #111113;
+              border: 2px solid #111113;
               ${vehicle.status === 'active' ? 'animation: pulse 2s infinite;' : ''}
             "></div>
             
-            <!-- Clock Badge -->
+            <!-- Clock Badge (bottom left, only show if not showing status) -->
             ${vehicle.clockedIn ? `
               <div style="
                 position: absolute;
-                bottom: -4px;
-                right: -4px;
-                width: 18px;
-                height: 18px;
+                bottom: -2px;
+                left: -2px;
+                width: 14px;
+                height: 14px;
                 background: #22c55e;
                 border-radius: 50%;
-                border: 3px solid #111113;
+                border: 2px solid #111113;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                font-size: 10px;
+                font-size: 8px;
               ">✓</div>
             ` : ''}
           </div>
@@ -285,67 +285,174 @@ const createVehicleIcon = (vehicle: VehicleLocation) => {
   })
 }
 
-// Floating Lead Capture Form
+// Floating Lead Capture Form with Email Verification
 function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string) => void }) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
+  const [verificationCode, setVerificationCode] = useState("")
+  const [step, setStep] = useState<"email" | "verify" | "success">("email")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState("")
+  const [demoCode, setDemoCode] = useState("") // For demo display only
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Step 1: Request verification code
+  const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
     
     setIsSubmitting(true)
+    setError("")
+    
     try {
+      const res = await fetch("/api/demo-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, action: "request" }),
+      })
+      
+      const data = await res.json()
+      
+      if (!res.ok) {
+        if (data.alreadyActive) {
+          setError("This email already has an active demo. Only one session per email allowed.")
+        } else {
+          setError(data.error || "Failed to send code")
+        }
+        return
+      }
+
+      // Also save lead
       await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, name, source: "fleet-demo" }),
       })
-      setIsSubmitted(true)
-      localStorage.setItem("swatech-demo-lead", JSON.stringify({ email, timestamp: Date.now() }))
-      onSubmit(email, name)
+
+      // For demo purposes, show the code
+      if (data.demoCode) {
+        setDemoCode(data.demoCode)
+      }
+      
+      setStep("verify")
     } catch {
-      // Still show success for demo
-      setIsSubmitted(true)
-      onSubmit(email, name)
+      setError("Connection error. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (isSubmitted) {
+  // Step 2: Verify code
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!verificationCode) return
+    
+    setIsSubmitting(true)
+    setError("")
+    
+    try {
+      const res = await fetch("/api/demo-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: verificationCode, action: "verify" }),
+      })
+      
+      const data = await res.json()
+      
+      if (!res.ok) {
+        setError(data.error || "Invalid code")
+        return
+      }
+
+      // Save session info
+      localStorage.setItem("swatech-demo-session", JSON.stringify({ 
+        email, 
+        sessionId: data.sessionId,
+        expiresAt: data.expiresAt 
+      }))
+      
+      setStep("success")
+      onSubmit(email, name)
+    } catch {
+      setError("Connection error. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  if (step === "success") {
     return (
-      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 backdrop-blur-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-green-500" />
+      <div className="bg-green-500/10 border border-green-500/30 rounded-xl md:rounded-2xl p-3 md:p-4 backdrop-blur-sm">
+        <div className="flex items-center gap-2 md:gap-3">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-green-500" />
           </div>
           <div>
-            <p className="font-semibold text-green-500">You're in!</p>
-            <p className="text-xs text-green-500/70">24h demo access - Open /driver on your phone</p>
+            <p className="font-semibold text-green-500 text-sm">Verified!</p>
+            <p className="text-[10px] md:text-xs text-green-500/70">24h access - Open /driver</p>
           </div>
         </div>
       </div>
     )
   }
 
+  if (step === "verify") {
+    return (
+      <form onSubmit={handleVerifyCode} className="bg-card/90 border border-border rounded-xl md:rounded-2xl p-3 md:p-4 backdrop-blur-sm space-y-2 md:space-y-3">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <p className="text-xs font-medium text-foreground">Enter verification code</p>
+        </div>
+        <p className="text-[10px] text-muted-foreground">
+          We sent a 6-digit code to {email}
+        </p>
+        {demoCode && (
+          <div className="bg-primary/10 border border-primary/30 rounded-lg p-2 text-center">
+            <p className="text-[10px] text-primary/70">Demo code:</p>
+            <p className="text-lg font-mono font-bold text-primary">{demoCode}</p>
+          </div>
+        )}
+        <input
+          type="text"
+          value={verificationCode}
+          onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+          placeholder="000000"
+          maxLength={6}
+          className="w-full px-3 py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm text-center font-mono tracking-widest"
+        />
+        {error && <p className="text-[10px] text-red-500">{error}</p>}
+        <button
+          type="submit"
+          disabled={isSubmitting || verificationCode.length !== 6}
+          className="w-full py-2 rounded-lg bg-primary text-primary-foreground font-medium text-xs md:text-sm transition-all hover:bg-primary/90 disabled:opacity-50"
+        >
+          {isSubmitting ? "Verifying..." : "Verify Code"}
+        </button>
+        <button
+          type="button"
+          onClick={() => { setStep("email"); setError(""); setDemoCode("") }}
+          className="w-full text-[10px] text-muted-foreground hover:text-foreground"
+        >
+          Use different email
+        </button>
+      </form>
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="bg-card/80 border border-border rounded-2xl p-4 backdrop-blur-sm space-y-3">
+    <form onSubmit={handleRequestCode} className="bg-card/90 border border-border rounded-xl md:rounded-2xl p-3 md:p-4 backdrop-blur-sm space-y-2 md:space-y-3">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <p className="text-xs font-medium text-foreground">Try the live demo</p>
+          <p className="text-[10px] md:text-xs font-medium text-foreground">Try the live demo</p>
         </div>
-        <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">24h access</span>
+        <span className="text-[8px] md:text-[10px] text-muted-foreground bg-secondary px-1.5 md:px-2 py-0.5 rounded-full">24h access</span>
       </div>
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Your name"
-        className="w-full px-3 py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+        className="w-full px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-xs md:text-sm"
       />
       <input
         type="email"
@@ -353,24 +460,25 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         onChange={(e) => setEmail(e.target.value)}
         placeholder="your@email.com"
         required
-        className="w-full px-3 py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+        className="w-full px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-xs md:text-sm"
       />
+      {error && <p className="text-[10px] text-red-500">{error}</p>}
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm transition-all hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2 rounded-lg bg-primary text-primary-foreground font-medium text-xs md:text-sm transition-all hover:bg-primary/90 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {isSubmitting ? (
           "Sending..."
         ) : (
           <>
-            <Send className="w-4 h-4" />
-            Get Demo Access
+            <Send className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            Get Verification Code
           </>
         )}
       </button>
-      <p className="text-[10px] text-muted-foreground/60 text-center">
-        No spam. We'll send you the driver app link.
+      <p className="text-[8px] md:text-[10px] text-muted-foreground/60 text-center">
+        One session per email. We verify to prevent abuse.
       </p>
     </form>
   )
