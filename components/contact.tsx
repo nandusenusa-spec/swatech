@@ -30,7 +30,7 @@ export function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Location</p>
-                  <p className="text-sm text-muted-foreground">Tampa, Florida</p>
+                  <p className="text-sm text-muted-foreground">Tampa, FL 33603</p>
                 </div>
               </div>
 
@@ -40,7 +40,9 @@ export function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Email</p>
-                  <p className="text-sm text-muted-foreground">hello@swatech.dev</p>
+                  <a href="mailto:info@swatworks.com" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    info@swatworks.com
+                  </a>
                 </div>
               </div>
 
@@ -50,7 +52,9 @@ export function Contact() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Phone</p>
-                  <p className="text-sm text-muted-foreground">(813) 555-0123</p>
+                  <a href="tel:+18132491241" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    (813) 249-1241
+                  </a>
                 </div>
               </div>
             </div>

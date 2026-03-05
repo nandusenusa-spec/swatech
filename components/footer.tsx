@@ -73,7 +73,7 @@ export function Footer() {
             </a>
           </div>
           <p className="text-[10px] text-muted-foreground/40">
-            Tampa, FL | Serving clients nationwide
+            Tampa, FL 33603 | (813) 249-1241
           </p>
         </div>
       </div>
