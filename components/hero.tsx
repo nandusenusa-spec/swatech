@@ -6,6 +6,11 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import type { VehicleLocation } from "@/lib/redis"
 
+interface HeroProps {
+  onAccessGranted?: (email: string) => void
+  hasAccess?: boolean
+}
+
 const words = ["Landing Pages", "Business Systems", "Custom Software", "Fleet Tracking"]
 
 const deliveryColors = {
@@ -358,11 +363,11 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
   )
 }
 
-export function Hero() {
+export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
   const [currentWord, setCurrentWord] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
   const [vehicles, setVehicles] = useState<VehicleLocation[]>([])
-  const [hasSubmittedLead, setHasSubmittedLead] = useState(false)
+  const [hasSubmittedLead, setHasSubmittedLead] = useState(hasAccess || false)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Map<string, L.Marker>>(new Map())
   const trailLayersRef = useRef<Map<string, L.Polyline>>(new Map())
@@ -373,8 +378,17 @@ export function Hero() {
     injectStyles()
   }, [])
 
+  // Sync with parent access state
+  useEffect(() => {
+    if (hasAccess !== undefined) {
+      setHasSubmittedLead(hasAccess)
+    }
+  }, [hasAccess])
+
   // Check if already submitted (with 24h expiration)
   useEffect(() => {
+    if (hasAccess !== undefined) return // Skip if controlled by parent
+    
     const savedData = localStorage.getItem("swatech-demo-lead")
     if (savedData) {
       try {
@@ -392,7 +406,7 @@ export function Hero() {
         localStorage.removeItem("swatech-demo-lead")
       }
     }
-  }, [])
+  }, [hasAccess])
 
   // Word rotation effect
   useEffect(() => {
@@ -716,7 +730,10 @@ export function Hero() {
               {/* Floating Lead Form */}
               <div className="absolute top-4 right-4 z-10 w-64">
                 {!hasSubmittedLead ? (
-                  <LeadCaptureForm onSubmit={() => setHasSubmittedLead(true)} />
+                  <LeadCaptureForm onSubmit={(email) => {
+                      setHasSubmittedLead(true)
+                      if (onAccessGranted) onAccessGranted(email)
+                    }} />
                 ) : (
                   <div className="bg-card/80 border border-border rounded-2xl p-3 backdrop-blur-sm">
                     <div className="flex items-center gap-2">
