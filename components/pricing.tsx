@@ -2,6 +2,15 @@
 
 import { Check, Zap } from "lucide-react"
 import { useState } from "react"
+import { Checkout } from "./checkout"
+
+// Map plan names to Stripe product IDs
+const PLAN_PRODUCT_IDS: Record<string, { monthly: string; yearly: string }> = {
+  "Starter": { monthly: "starter-yearly", yearly: "starter-yearly" }, // Only yearly
+  "Business": { monthly: "business-monthly", yearly: "business-yearly" },
+  "PYMES": { monthly: "pymes-monthly", yearly: "pymes-yearly" },
+  "Professional": { monthly: "professional-monthly", yearly: "professional-yearly" },
+}
 
 const plans = [
   {
@@ -88,6 +97,15 @@ const plans = [
 
 export function Pricing() {
   const [annual, setAnnual] = useState(false)
+  const [checkoutProduct, setCheckoutProduct] = useState<string | null>(null)
+
+  const handleGetStarted = (planName: string) => {
+    const productIds = PLAN_PRODUCT_IDS[planName]
+    if (productIds) {
+      const productId = annual ? productIds.yearly : productIds.monthly
+      setCheckoutProduct(productId)
+    }
+  }
 
   return (
     <section id="pricing" className="relative py-24 lg:py-32">
@@ -182,16 +200,16 @@ export function Pricing() {
               </div>
 
               {/* CTA */}
-              <a
-                href="#contact"
-                className={`mt-6 flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-all ${
+              <button
+                onClick={() => handleGetStarted(plan.name)}
+                className={`mt-6 flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-all cursor-pointer ${
                   plan.highlight
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "border border-border bg-secondary text-secondary-foreground hover:bg-border"
                 }`}
               >
                 {plan.priceMonthly === "Custom" ? "Contact Us" : "Get Started"}
-              </a>
+              </button>
 
               {/* Divider */}
               <div className="my-6 h-px bg-border/50" />
@@ -235,6 +253,14 @@ export function Pricing() {
           </p>
         </div>
       </div>
+
+      {/* Stripe Checkout Modal */}
+      {checkoutProduct && (
+        <Checkout 
+          productId={checkoutProduct} 
+          onClose={() => setCheckoutProduct(null)} 
+        />
+      )}
     </section>
   )
 }
