@@ -74,6 +74,15 @@ export function Navbar() {
         {/* CTA */}
         <div className="hidden items-center gap-3 md:flex">
           <a
+            href="https://swatworks.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-lg border border-border bg-secondary px-3 py-2 text-sm font-medium text-foreground transition-all hover:bg-secondary/80"
+          >
+            <span className="text-xs font-bold text-orange-500">PZ</span>
+            <span className="text-muted-foreground">Print Zone</span>
+          </a>
+          <a
             href="https://swatworks.net/dashboard"
             target="_blank"
             rel="noopener noreferrer"
@@ -116,10 +125,20 @@ export function Navbar() {
               </a>
             ))}
             <a
-              href="https://swatworks.net/dashboard"
+              href="https://swatworks.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-foreground"
+              onClick={() => setMobileOpen(false)}
+            >
+              <span className="text-xs font-bold text-orange-500">PZ</span>
+              Print Zone
+            </a>
+            <a
+              href="https://swatworks.net/dashboard"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-foreground"
               onClick={() => setMobileOpen(false)}
             >
               <span className="text-xs font-bold text-primary">WP</span>
