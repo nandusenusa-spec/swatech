@@ -4,6 +4,7 @@ import { Services } from "@/components/services"
 import { HowItWorks } from "@/components/how-it-works"
 import { ExclusivityBanner } from "@/components/exclusivity-banner"
 import { Pricing } from "@/components/pricing"
+import { GoogleReviews } from "@/components/google-reviews"
 import { FAQ } from "@/components/faq"
 import { Contact } from "@/components/contact"
 import { Footer } from "@/components/footer"
@@ -17,6 +18,7 @@ export default function Home() {
       <HowItWorks />
       <ExclusivityBanner />
       <Pricing />
+      <GoogleReviews />
       <FAQ />
       <Contact />
       <Footer />

@@ -286,7 +286,7 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         body: JSON.stringify({ email, name, source: "fleet-demo" }),
       })
       setIsSubmitted(true)
-      localStorage.setItem("swatech-demo-lead", email)
+      localStorage.setItem("swatech-demo-lead", JSON.stringify({ email, timestamp: Date.now() }))
       onSubmit(email, name)
     } catch {
       // Still show success for demo
@@ -370,11 +370,24 @@ export function Hero() {
     injectStyles()
   }, [])
 
-  // Check if already submitted
+  // Check if already submitted (with 24h expiration)
   useEffect(() => {
-    const savedLead = localStorage.getItem("swatech-demo-lead")
-    if (savedLead) {
-      setHasSubmittedLead(true)
+    const savedData = localStorage.getItem("swatech-demo-lead")
+    if (savedData) {
+      try {
+        const { timestamp } = JSON.parse(savedData)
+        const now = Date.now()
+        const hours24 = 24 * 60 * 60 * 1000
+        if (now - timestamp < hours24) {
+          setHasSubmittedLead(true)
+        } else {
+          // Expired, clear it
+          localStorage.removeItem("swatech-demo-lead")
+        }
+      } catch {
+        // Old format without timestamp, clear it
+        localStorage.removeItem("swatech-demo-lead")
+      }
     }
   }, [])
 
@@ -500,7 +513,7 @@ export function Hero() {
               ${vehicle.avatarType === 'emoji' && vehicle.avatar ? vehicle.avatar : (vehicle.name?.charAt(0).toUpperCase() || '?')}
             </div>
             <div>
-              <p style="font-weight: 700; margin: 0; font-size: 15px; color: #fff;">${vehicle.name}</p>
+              <p style="font-weight: 700; margin: 0; font-size: 15px; color: #111;">${vehicle.name}</p>
               <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
                 <span style="
                   display: inline-block;
@@ -509,8 +522,8 @@ export function Hero() {
                   border-radius: 50%;
                   background: ${vehicle.status === "active" ? "#22c55e" : vehicle.status === "idle" ? "#eab308" : "#ef4444"};
                 "></span>
-                <span style="color: #71717a; font-size: 11px; text-transform: uppercase; font-weight: 600;">
-                  ${vehicle.status}
+                <span style="color: #52525b; font-size: 11px; text-transform: uppercase; font-weight: 600;">
+                  ${vehicle.status === "idle" ? "PARKED" : vehicle.status === "active" ? "MOVING" : "OFFLINE"}
                 </span>
                 ${vehicle.streak && vehicle.streak > 0 ? `<span style="color: #f97316; font-size: 11px;">🔥 ${vehicle.streak}</span>` : ''}
               </div>
@@ -520,7 +533,7 @@ export function Hero() {
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div style="background: #1a1a1f; padding: 10px; border-radius: 10px;">
               <p style="color: #71717a; font-size: 10px; margin: 0; text-transform: uppercase;">Speed</p>
-              <p style="color: #fff; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
+              <p style="color: #111; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
                 ${(vehicle.speed * 2.237).toFixed(0)} 
                 <span style="font-size: 10px; color: #71717a; font-weight: 400;">mph</span>
                 ${vehicle.speed * 2.237 > 30 ? ' 🔥' : ''}
@@ -528,7 +541,7 @@ export function Hero() {
             </div>
             <div style="background: #1a1a1f; padding: 10px; border-radius: 10px;">
               <p style="color: #71717a; font-size: 10px; margin: 0; text-transform: uppercase;">Miles Today</p>
-              <p style="color: #fff; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
+              <p style="color: #111; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
                 ${(vehicle.totalMiles || 0).toFixed(1)}
               </p>
               <div style="height: 3px; background: #27272a; border-radius: 2px; margin-top: 4px; overflow: hidden;">
