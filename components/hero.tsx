@@ -701,62 +701,62 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
             </div>
 
             {/* Mini Stats */}
-            <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <div className="mt-6 md:mt-10 grid grid-cols-2 gap-4 md:gap-6 sm:grid-cols-4">
               {[
                 { value: "50+", label: "Projects" },
                 { value: "99%", label: "Uptime" },
                 { value: "24/7", label: "Support" },
-                { value: "$200", label: "Starting/yr" },
+                { value: "$199", label: "Starting/yr" },
               ].map((stat) => (
                 <div key={stat.label} className="flex flex-col">
-                  <span className="text-2xl font-bold text-foreground font-mono">{stat.value}</span>
-                  <span className="mt-0.5 text-xs text-muted-foreground">{stat.label}</span>
+                  <span className="text-xl md:text-2xl font-bold text-foreground font-mono">{stat.value}</span>
+                  <span className="mt-0.5 text-[10px] md:text-xs text-muted-foreground">{stat.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right Column - Live Map (Always Visible) */}
-          <div className="relative flex flex-col gap-4">
+          <div className="relative flex flex-col gap-3 md:gap-4">
             {/* Demo Label */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1">
-                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-semibold text-primary">LIVE DEMO</span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="flex items-center gap-1.5 md:gap-2 rounded-full border border-primary/30 bg-primary/10 px-2 md:px-3 py-1">
+                  <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="text-[10px] md:text-xs font-semibold text-primary">LIVE DEMO</span>
                 </div>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[10px] md:text-xs text-muted-foreground hidden sm:inline">
                   Real-time Fleet Tracking
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
                 <Navigation className="w-3 h-3 text-primary" />
                 {activeCount}/{totalCount} active
               </div>
             </div>
 
             {/* Map Container - Always Visible */}
-            <div className="relative h-[400px] lg:h-[500px] rounded-2xl border border-border bg-card overflow-hidden shadow-2xl shadow-primary/5">
+            <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] rounded-xl md:rounded-2xl border border-border bg-card overflow-hidden shadow-2xl shadow-primary/5">
               {/* Map */}
               <div ref={containerRef} className="absolute inset-0 z-0" />
               
-              {/* Floating Lead Form */}
-              <div className="absolute top-4 right-4 z-10 w-64">
+              {/* Floating Lead Form - Responsive positioning */}
+              <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 w-52 sm:w-64">
                 {!hasSubmittedLead ? (
                   <LeadCaptureForm onSubmit={(email) => {
                       setHasSubmittedLead(true)
                       if (onAccessGranted) onAccessGranted(email)
                     }} />
                 ) : (
-                  <div className="bg-card/80 border border-border rounded-2xl p-3 backdrop-blur-sm">
+                  <div className="bg-card/90 border border-border rounded-xl md:rounded-2xl p-2 sm:p-3 backdrop-blur-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                      <p className="text-xs text-foreground">Demo unlocked!</p>
+                      <p className="text-[10px] sm:text-xs text-foreground">Demo unlocked!</p>
                     </div>
                     <a 
                       href="/driver" 
                       target="_blank"
-                      className="mt-2 block w-full py-2 px-3 rounded-lg bg-primary/10 text-primary text-xs font-medium text-center hover:bg-primary/20 transition-all"
+                      className="mt-2 block w-full py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg bg-primary/10 text-primary text-[10px] sm:text-xs font-medium text-center hover:bg-primary/20 active:scale-95 transition-all"
                     >
                       Open Driver App
                     </a>
@@ -766,13 +766,13 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
 
               {/* Empty State */}
               {vehicles.length === 0 && (
-                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                  <div className="text-center p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border">
-                    <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 animate-bounce" style={{ animationDuration: "2s" }}>
-                      <Navigation className="w-8 h-8 text-primary" />
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none p-4">
+                  <div className="text-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-card/80 backdrop-blur-sm border border-border max-w-xs">
+                    <div className="w-12 h-12 md:w-16 md:h-16 mx-auto rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center mb-3 md:mb-4 animate-bounce" style={{ animationDuration: "2s" }}>
+                      <Navigation className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                     </div>
-                    <p className="font-medium text-foreground">Waiting for vehicles...</p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="font-medium text-foreground text-sm md:text-base">Waiting for vehicles...</p>
+                    <p className="text-xs md:text-sm text-muted-foreground mt-1">
                       Open /driver on your phone to start
                     </p>
                   </div>
@@ -781,21 +781,21 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
 
               {/* Stats Overlay */}
               {vehicles.length > 0 && (
-                <div className="absolute bottom-4 left-4 z-10 flex gap-2">
-                  <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
-                    <p className="text-[10px] text-muted-foreground uppercase">Vehicles</p>
-                    <p className="text-lg font-bold text-foreground">{totalCount}</p>
+                <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 z-10 flex gap-1.5 sm:gap-2">
+                  <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                    <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase">Vehicles</p>
+                    <p className="text-sm sm:text-lg font-bold text-foreground">{totalCount}</p>
                   </div>
-                  <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
-                    <p className="text-[10px] text-muted-foreground uppercase">Active</p>
-                    <p className="text-lg font-bold text-green-500">{activeCount}</p>
+                  <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
+                    <p className="text-[8px] sm:text-[10px] text-muted-foreground uppercase">Active</p>
+                    <p className="text-sm sm:text-lg font-bold text-green-500">{activeCount}</p>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Footer Note */}
-            <p className="text-xs text-muted-foreground/60 text-center">
+            <p className="text-[10px] md:text-xs text-muted-foreground/60 text-center">
               This is a working demo. Vehicles update in real-time every 2 seconds.
             </p>
           </div>

@@ -182,7 +182,7 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
         </div>
 
         {/* Feature badges */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-6 md:mb-8 px-2">
           {[
             { icon: Zap, label: "Real-time Sync" },
             { icon: QrCode, label: "Barcode Scanner" },
@@ -193,31 +193,33 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
           ].map((feature, i) => (
             <div 
               key={feature.label}
-              className="flex items-center gap-2 rounded-full bg-secondary/50 border border-border/50 px-3 py-1.5 text-xs text-muted-foreground"
+              className="flex items-center gap-1.5 md:gap-2 rounded-full bg-secondary/50 border border-border/50 px-2 md:px-3 py-1 md:py-1.5 text-[10px] md:text-xs text-muted-foreground"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <feature.icon className="w-3.5 h-3.5 text-primary" />
-              {feature.label}
+              <feature.icon className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
+              <span className="hidden sm:inline">{feature.label}</span>
+              <span className="sm:hidden">{feature.label.split(' ')[0]}</span>
             </div>
           ))}
         </div>
 
         {/* Main Dashboard */}
-        <div className="relative rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
+        <div className="relative rounded-xl md:rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden mx-2 md:mx-0">
           {/* Top bar */}
-          <div className="flex items-center justify-between border-b border-border/50 px-4 py-3 bg-secondary/30">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80" />
+          <div className="flex items-center justify-between border-b border-border/50 px-3 md:px-4 py-2 md:py-3 bg-secondary/30">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex items-center gap-1 md:gap-1.5">
+                <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-red-500/80" />
+                <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-green-500/80" />
               </div>
-              <span className="text-sm font-medium text-muted-foreground">SWATech Inventory Pro</span>
+              <span className="text-xs md:text-sm font-medium text-muted-foreground hidden sm:inline">SWATech Inventory Pro</span>
+              <span className="text-xs font-medium text-muted-foreground sm:hidden">Inventory</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded">24h demo</span>
-              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs text-green-500">Live</span>
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <span className="text-[10px] md:text-xs text-muted-foreground bg-secondary px-1.5 md:px-2 py-0.5 rounded">24h demo</span>
+              <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[10px] md:text-xs text-green-500">Live</span>
             </div>
           </div>
 
@@ -296,70 +298,70 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
             </div>
           )}
 
-          <div className="p-4 md:p-6">
+          <div className="p-3 md:p-6">
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Total Value</span>
-                  <TrendingUp className="w-4 h-4 text-green-500" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-6">
+              <div className="rounded-lg md:rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-2.5 md:p-4">
+                <div className="flex items-center justify-between mb-1 md:mb-2">
+                  <span className="text-[10px] md:text-xs text-muted-foreground">Total Value</span>
+                  <TrendingUp className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
                 </div>
-                <p className="text-2xl font-bold text-foreground">
+                <p className="text-lg md:text-2xl font-bold text-foreground">
                   ${displayedTotalValue.toLocaleString()}
                 </p>
-                <p className="text-xs text-green-500 flex items-center gap-1 mt-1">
-                  <ArrowUpRight className="w-3 h-3" /> +12.5% this month
+                <p className="text-[10px] md:text-xs text-green-500 flex items-center gap-1 mt-0.5 md:mt-1">
+                  <ArrowUpRight className="w-2.5 h-2.5 md:w-3 md:h-3" /> +12.5%
                 </p>
               </div>
               
-              <div className="rounded-xl bg-secondary/50 border border-border/50 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Total Items</span>
-                  <Box className="w-4 h-4 text-primary" />
+              <div className="rounded-lg md:rounded-xl bg-secondary/50 border border-border/50 p-2.5 md:p-4">
+                <div className="flex items-center justify-between mb-1 md:mb-2">
+                  <span className="text-[10px] md:text-xs text-muted-foreground">Total Items</span>
+                  <Box className="w-3 h-3 md:w-4 md:h-4 text-primary" />
                 </div>
-                <p className="text-2xl font-bold text-foreground">{displayedTotalItems}</p>
-                <p className="text-xs text-muted-foreground mt-1">Across {products.length} SKUs</p>
+                <p className="text-lg md:text-2xl font-bold text-foreground">{displayedTotalItems}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">{products.length} SKUs</p>
               </div>
               
-              <div className="rounded-xl bg-secondary/50 border border-border/50 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Low Stock</span>
-                  <AlertTriangle className={`w-4 h-4 ${lowStockCount > 0 ? "text-amber-500" : "text-muted-foreground"}`} />
+              <div className="rounded-lg md:rounded-xl bg-secondary/50 border border-border/50 p-2.5 md:p-4">
+                <div className="flex items-center justify-between mb-1 md:mb-2">
+                  <span className="text-[10px] md:text-xs text-muted-foreground">Low Stock</span>
+                  <AlertTriangle className={`w-3 h-3 md:w-4 md:h-4 ${lowStockCount > 0 ? "text-amber-500" : "text-muted-foreground"}`} />
                 </div>
-                <p className={`text-2xl font-bold ${lowStockCount > 0 ? "text-amber-500" : "text-foreground"}`}>
+                <p className={`text-lg md:text-2xl font-bold ${lowStockCount > 0 ? "text-amber-500" : "text-foreground"}`}>
                   {lowStockCount}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Need reorder</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Reorder</p>
               </div>
               
-              <div className="rounded-xl bg-secondary/50 border border-border/50 p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground">Movements Today</span>
-                  <Truck className="w-4 h-4 text-primary" />
+              <div className="rounded-lg md:rounded-xl bg-secondary/50 border border-border/50 p-2.5 md:p-4">
+                <div className="flex items-center justify-between mb-1 md:mb-2">
+                  <span className="text-[10px] md:text-xs text-muted-foreground">Movements</span>
+                  <Truck className="w-3 h-3 md:w-4 md:h-4 text-primary" />
                 </div>
-                <p className="text-2xl font-bold text-foreground">{movements.length}</p>
-                <p className="text-xs text-muted-foreground mt-1">In/Out transactions</p>
+                <p className="text-lg md:text-2xl font-bold text-foreground">{movements.length}</p>
+                <p className="text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1">Today</p>
               </div>
             </div>
 
             {/* Action bar */}
-            <div className="flex flex-col md:flex-row gap-3 mb-6">
+            <div className="flex flex-col md:flex-row gap-2 md:gap-3 mb-4 md:mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Search className="absolute left-2.5 md:left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 md:w-4 md:h-4 text-muted-foreground" />
                 <input
                   type="text"
-                  placeholder="Search products or SKU..."
+                  placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full pl-8 md:pl-10 pr-3 md:pr-4 py-2 md:py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-xs md:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 md:gap-2">
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="flex-1 md:flex-none px-2 md:px-3 py-2 md:py-2.5 rounded-lg bg-secondary/50 border border-border/50 text-xs md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 >
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -368,53 +370,53 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
                 
                 <button 
                   onClick={simulateScan}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
+                  className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-lg bg-primary text-primary-foreground text-xs md:text-sm font-medium hover:bg-primary/90 active:scale-95 transition-all"
                 >
-                  <QrCode className="w-4 h-4" />
-                  <span className="hidden md:inline">Scan</span>
+                  <QrCode className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                  <span className="hidden sm:inline">Scan</span>
                 </button>
                 
                 <button 
                   onClick={handleRefresh}
-                  className={`p-2.5 rounded-lg bg-secondary/50 border border-border/50 text-muted-foreground hover:text-foreground transition-colors ${isRefreshing ? "animate-spin" : ""}`}
+                  className={`p-2 md:p-2.5 rounded-lg bg-secondary/50 border border-border/50 text-muted-foreground hover:text-foreground active:scale-95 transition-all ${isRefreshing ? "animate-spin" : ""}`}
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <RefreshCw className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </button>
               </div>
             </div>
 
             {/* Main content grid */}
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-4 md:gap-6">
               {/* Products table */}
-              <div className="md:col-span-2 rounded-xl border border-border/50 overflow-hidden">
-                <div className="bg-secondary/30 px-4 py-2 border-b border-border/50">
-                  <p className="text-sm font-medium text-foreground">Products ({filteredProducts.length})</p>
+              <div className="md:col-span-2 rounded-lg md:rounded-xl border border-border/50 overflow-hidden">
+                <div className="bg-secondary/30 px-3 md:px-4 py-2 border-b border-border/50">
+                  <p className="text-xs md:text-sm font-medium text-foreground">Products ({filteredProducts.length})</p>
                 </div>
-                <div className="divide-y divide-border/50 max-h-[400px] overflow-y-auto">
+                <div className="divide-y divide-border/50 max-h-[280px] md:max-h-[400px] overflow-y-auto">
                   {filteredProducts.map((product, i) => (
                     <div 
                       key={product.id}
-                      className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/30 transition-colors cursor-pointer group"
+                      className="flex items-center gap-2.5 md:gap-4 px-2.5 md:px-4 py-2.5 md:py-3 hover:bg-secondary/30 active:bg-secondary/50 transition-colors cursor-pointer group"
                       onClick={() => { setSelectedProduct(product); setShowQuickAdd(true) }}
                       style={{ animationDelay: `${i * 50}ms` }}
                     >
-                      <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                        <span className="text-xl">{product.image}</span>
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                        <span className="text-base md:text-xl">{product.image}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm text-foreground truncate">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">{product.id} · {product.category}</p>
+                        <p className="font-medium text-xs md:text-sm text-foreground truncate">{product.name}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground truncate">{product.id}</p>
                       </div>
-                      <div className="text-right">
-                        <p className={`font-semibold text-sm ${
+                      <div className="text-right shrink-0">
+                        <p className={`font-semibold text-xs md:text-sm ${
                           product.stock <= product.minStock ? "text-amber-500" : "text-foreground"
                         }`}>
-                          {product.stock} units
+                          {product.stock}
                         </p>
-                        <p className="text-xs text-muted-foreground">${product.price}</p>
+                        <p className="text-[10px] md:text-xs text-muted-foreground">${product.price}</p>
                       </div>
                       {product.stock <= product.minStock && (
-                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
                       )}
                     </div>
                   ))}
@@ -422,36 +424,36 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
               </div>
 
               {/* Activity feed */}
-              <div className="rounded-xl border border-border/50 overflow-hidden">
-                <div className="bg-secondary/30 px-4 py-2 border-b border-border/50 flex items-center justify-between">
-                  <p className="text-sm font-medium text-foreground">Live Activity</p>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    <span className="text-xs text-green-500">Live</span>
+              <div className="rounded-lg md:rounded-xl border border-border/50 overflow-hidden">
+                <div className="bg-secondary/30 px-3 md:px-4 py-2 border-b border-border/50 flex items-center justify-between">
+                  <p className="text-xs md:text-sm font-medium text-foreground">Live Activity</p>
+                  <div className="flex items-center gap-1 md:gap-1.5">
+                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-[10px] md:text-xs text-green-500">Live</span>
                   </div>
                 </div>
-                <div className="divide-y divide-border/50 max-h-[400px] overflow-y-auto">
+                <div className="divide-y divide-border/50 max-h-[200px] md:max-h-[400px] overflow-y-auto">
                   {movements.map((movement, i) => (
                     <div 
                       key={movement.id}
-                      className="px-4 py-3 animate-in slide-in-from-right duration-300"
+                      className="px-2.5 md:px-4 py-2 md:py-3 animate-in slide-in-from-right duration-300"
                       style={{ animationDelay: `${i * 100}ms` }}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 ${
                           movement.type === "in" 
                             ? "bg-green-500/10 text-green-500" 
                             : "bg-red-500/10 text-red-500"
                         }`}>
-                          {movement.type === "in" ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+                          {movement.type === "in" ? <ArrowDownRight className="w-3 h-3 md:w-4 md:h-4" /> : <ArrowUpRight className="w-3 h-3 md:w-4 md:h-4" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-foreground truncate">{movement.product}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs md:text-sm text-foreground truncate">{movement.product}</p>
+                          <p className="text-[10px] md:text-xs text-muted-foreground">
                             {movement.type === "in" ? "+" : "-"}{movement.quantity} · {movement.user}
                           </p>
                         </div>
-                        <span className="text-xs text-muted-foreground">{movement.time}</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground shrink-0">{movement.time}</span>
                       </div>
                     </div>
                   ))}
@@ -460,17 +462,17 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
             </div>
 
             {/* Bottom features row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mt-4 md:mt-6">
               {[
-                { icon: ShoppingCart, label: "Auto Purchase Orders", desc: "AI-powered reordering" },
-                { icon: Globe, label: "Multi-location", desc: "3 warehouses synced" },
-                { icon: Clock, label: "History & Audit", desc: "Full traceability" },
-                { icon: Sparkles, label: "Smart Predictions", desc: "Demand forecasting" },
+                { icon: ShoppingCart, label: "Auto Reorder", desc: "AI-powered" },
+                { icon: Globe, label: "Multi-location", desc: "3 warehouses" },
+                { icon: Clock, label: "Audit Trail", desc: "Full history" },
+                { icon: Sparkles, label: "Predictions", desc: "Forecasting" },
               ].map((feature) => (
-                <div key={feature.label} className="rounded-lg bg-secondary/30 border border-border/50 p-3 text-center">
-                  <feature.icon className="w-5 h-5 text-primary mx-auto mb-2" />
-                  <p className="text-xs font-medium text-foreground">{feature.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{feature.desc}</p>
+                <div key={feature.label} className="rounded-lg bg-secondary/30 border border-border/50 p-2 md:p-3 text-center">
+                  <feature.icon className="w-4 h-4 md:w-5 md:h-5 text-primary mx-auto mb-1 md:mb-2" />
+                  <p className="text-[10px] md:text-xs font-medium text-foreground">{feature.label}</p>
+                  <p className="text-[8px] md:text-[10px] text-muted-foreground">{feature.desc}</p>
                 </div>
               ))}
             </div>
@@ -478,20 +480,20 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
 
           {/* Access overlay */}
           {!hasAccess && (
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/80 backdrop-blur-[2px] flex items-end justify-center pb-12">
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/95 to-background/80 backdrop-blur-[2px] flex items-end justify-center pb-8 md:pb-12">
               <div className="text-center px-4">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <Package className="w-8 h-8 text-primary" />
+                <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl md:rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                  <Package className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Try the Inventory Demo</h3>
-                <p className="text-sm text-muted-foreground max-w-md mb-6">
-                  Enter your email for 24-hour access to our enterprise inventory management system.
+                <h3 className="text-lg md:text-xl font-bold text-foreground mb-1.5 md:mb-2">Try the Inventory Demo</h3>
+                <p className="text-xs md:text-sm text-muted-foreground max-w-md mb-4 md:mb-6">
+                  Enter your email for 24-hour access to our inventory system.
                 </p>
                 <button
                   onClick={onRequestAccess}
-                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 md:px-6 py-2.5 md:py-3 text-xs md:text-sm font-semibold text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all"
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   Unlock Demo Access
                 </button>
               </div>
@@ -500,15 +502,15 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
         </div>
 
         {/* CTA */}
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground mb-4">
-            All of this is included in our <span className="text-primary font-semibold">PYMES plan at $169/month</span>
+        <div className="mt-6 md:mt-8 text-center px-4">
+          <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">
+            All included in our <span className="text-primary font-semibold">PYMES plan at $169/month</span>
           </p>
           <a 
             href="#pricing" 
-            className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 md:gap-2 text-xs md:text-sm font-medium text-primary hover:underline"
           >
-            View all pricing plans <ArrowUpRight className="w-4 h-4" />
+            View all pricing plans <ArrowUpRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
           </a>
         </div>
       </div>
