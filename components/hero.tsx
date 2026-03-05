@@ -306,7 +306,7 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
           </div>
           <div>
             <p className="font-semibold text-green-500">You're in!</p>
-            <p className="text-xs text-green-500/70">Open /driver on your phone to test</p>
+            <p className="text-xs text-green-500/70">24h demo access - Open /driver on your phone</p>
           </div>
         </div>
       </div>
@@ -315,9 +315,12 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
 
   return (
     <form onSubmit={handleSubmit} className="bg-card/80 border border-border rounded-2xl p-4 backdrop-blur-sm space-y-3">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-        <p className="text-xs font-medium text-foreground">Try the live demo</p>
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+          <p className="text-xs font-medium text-foreground">Try the live demo</p>
+        </div>
+        <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">24h access</span>
       </div>
       <input
         type="text"

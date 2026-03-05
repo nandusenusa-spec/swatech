@@ -7,39 +7,57 @@ export interface Product {
 }
 
 export const PRODUCTS: Product[] = [
+  // Starter - Business Contact Page
   {
     id: "starter-yearly",
-    name: "SWATech Starter Plan (Annual)",
-    description: "Custom landing page, contact form, corporate email, and domain setup",
+    name: "SWATech Starter - Business Contact Page (Annual)",
+    description: "Professional contact page, corporate email, custom domain, 24/7 online visibility",
     priceInCents: 20000, // $200/year
     billingType: "yearly",
   },
+  // Business - Landing Page Pro
   {
     id: "business-monthly",
-    name: "SWATech Business Plan (Monthly)",
-    description: "Complete business dashboard with CRM, scheduling, inventory, and reports",
-    priceInCents: 9900, // $99/month
+    name: "SWATech Business - Landing Page Pro (Monthly)",
+    description: "Complete landing page with copywriting, design, conversion optimization, analytics",
+    priceInCents: 6000, // $60/month
     billingType: "monthly",
   },
   {
     id: "business-yearly",
-    name: "SWATech Business Plan (Annual)",
-    description: "Complete business dashboard with CRM, scheduling, inventory, and reports",
-    priceInCents: 99000, // $990/year (save ~$200)
+    name: "SWATech Business - Landing Page Pro (Annual)",
+    description: "Complete landing page with copywriting, design, conversion optimization, analytics",
+    priceInCents: 60000, // $600/year (save $120)
     billingType: "yearly",
   },
+  // PYMES - Business Systems
+  {
+    id: "pymes-monthly",
+    name: "SWATech PYMES - Business Systems (Monthly)",
+    description: "Complete management system: CRM, scheduling, inventory, billing, employee management",
+    priceInCents: 16900, // $169/month
+    billingType: "monthly",
+  },
+  {
+    id: "pymes-yearly",
+    name: "SWATech PYMES - Business Systems (Annual)",
+    description: "Complete management system: CRM, scheduling, inventory, billing, employee management",
+    priceInCents: 169000, // $1,690/year (save ~$338)
+    billingType: "yearly",
+  },
+  // Professional - Advanced Systems
   {
     id: "professional-monthly",
-    name: "SWATech Professional Plan (Monthly)",
-    description: "Advanced integrations, multi-location support, dedicated account manager",
-    priceInCents: 19900, // $199/month
+    name: "SWATech Professional - Advanced Systems (Monthly)",
+    description: "Scalable solutions with API integrations, multi-location, advanced analytics",
+    priceInCents: 39900, // $399/month
     billingType: "monthly",
   },
   {
     id: "professional-yearly",
-    name: "SWATech Professional Plan (Annual)",
-    description: "Advanced integrations, multi-location support, dedicated account manager",
-    priceInCents: 199000, // $1,990/year (save ~$400)
+    name: "SWATech Professional - Advanced Systems (Annual)",
+    description: "Scalable solutions with API integrations, multi-location, advanced analytics",
+    priceInCents: 399000, // $3,990/year (save ~$798)
     billingType: "yearly",
   },
 ]
