@@ -15,4 +15,10 @@ export interface VehicleLocation {
   timestamp: number
   status: "active" | "idle" | "offline"
   phone?: string
+  avatar?: string
+  deliveryStatus?: "none" | "pickup" | "in-transit" | "delivered"
+  clockedIn?: boolean
+  clockInTime?: number
+  totalMiles?: number
+  message?: string
 }

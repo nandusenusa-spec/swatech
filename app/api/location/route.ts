@@ -8,7 +8,10 @@ const LOCATION_EXPIRY = 60 // seconds - location expires if no update in 60s
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, lat, lng, speed = 0, heading = 0, phone } = body
+    const { 
+      id, name, lat, lng, speed = 0, heading = 0, phone,
+      avatar, deliveryStatus, clockedIn, clockInTime, totalMiles, message
+    } = body
 
     if (!id || !name || lat === undefined || lng === undefined) {
       return NextResponse.json(
@@ -27,6 +30,12 @@ export async function POST(request: NextRequest) {
       timestamp: Date.now(),
       status: "active",
       phone: phone || undefined,
+      avatar: avatar || undefined,
+      deliveryStatus: deliveryStatus || "none",
+      clockedIn: clockedIn ?? false,
+      clockInTime: clockInTime || undefined,
+      totalMiles: totalMiles || 0,
+      message: message || undefined,
     }
 
     // Store in Redis hash with expiry handling via sorted set
