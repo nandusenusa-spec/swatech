@@ -1,18 +1,48 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Menu, X } from "lucide-react"
 
 const navLinks = [
-  { label: "Services", href: "#services" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
+  { label: "Services", href: "services" },
+  { label: "How It Works", href: "how-it-works" },
+  { label: "Pricing", href: "pricing" },
+  { label: "FAQ", href: "faq" },
+  { label: "Contact", href: "contact" },
 ]
+
+// Custom easing function
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+function smoothScrollTo(targetY: number, duration: number = 800) {
+  const startY = window.scrollY
+  const difference = targetY - startY
+  const startTime = performance.now()
+
+  function step(currentTime: number) {
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / duration, 1)
+    const easedProgress = easeInOutCubic(progress)
+    window.scrollTo(0, startY + difference * easedProgress)
+    if (progress < 1) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault()
+    const element = document.getElementById(sectionId)
+    if (element) {
+      const offsetTop = element.offsetTop - 80
+      smoothScrollTo(offsetTop, 800)
+    }
+    setMobileOpen(false)
+  }, [])
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -32,8 +62,9 @@ export function Navbar() {
           {navLinks.map((link) => (
             <a
               key={link.href}
-              href={link.href}
-              className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
+              href={`#${link.href}`}
+              onClick={(e) => handleNavClick(e, link.href)}
+              className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full cursor-pointer"
             >
               {link.label}
             </a>
@@ -53,7 +84,8 @@ export function Navbar() {
           </a>
           <a
             href="#contact"
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 btn-hover"
+            onClick={(e) => handleNavClick(e, "contact")}
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 btn-hover cursor-pointer"
           >
             Schedule a Demo
           </a>
@@ -76,9 +108,9 @@ export function Navbar() {
             {navLinks.map((link) => (
               <a
                 key={link.href}
-                href={link.href}
-                className="rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                onClick={() => setMobileOpen(false)}
+                href={`#${link.href}`}
+                className="rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground cursor-pointer"
+                onClick={(e) => handleNavClick(e, link.href)}
               >
                 {link.label}
               </a>
@@ -95,8 +127,8 @@ export function Navbar() {
             </a>
             <a
               href="#contact"
-              className="rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-semibold text-primary-foreground"
-              onClick={() => setMobileOpen(false)}
+              className="rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-semibold text-primary-foreground cursor-pointer"
+              onClick={(e) => handleNavClick(e, "contact")}
             >
               Schedule a Demo
             </a>

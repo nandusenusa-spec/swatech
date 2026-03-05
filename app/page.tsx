@@ -1,4 +1,5 @@
 import { Navbar } from "@/components/navbar"
+import { ScrollNavigation } from "@/components/scroll-navigation"
 import { DemosSection } from "@/components/demos-section"
 import { Services } from "@/components/services"
 import { HowItWorks } from "@/components/how-it-works"
@@ -13,7 +14,10 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
-      <DemosSection />
+      <ScrollNavigation />
+      <section id="hero">
+        <DemosSection />
+      </section>
       <Services />
       <HowItWorks />
       <ExclusivityBanner />
