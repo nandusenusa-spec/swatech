@@ -1,6 +1,6 @@
 "use client"
 
-import { ArrowRight, Play, MapPin, MessageCircle, Phone, Navigation, Package, Clock, Route, Mail, X, Check } from "lucide-react"
+import { ArrowRight, Play, Navigation, Mail, Sparkles, Send } from "lucide-react"
 import { useEffect, useState, useRef, useCallback } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
@@ -15,201 +15,343 @@ const deliveryColors = {
   delivered: "#22c55e",
 }
 
-const deliveryLabels = {
-  none: "No Delivery",
-  pickup: "Pickup",
-  "in-transit": "In Transit",
-  delivered: "Delivered",
+// CSS Animations injected into head
+const injectStyles = () => {
+  if (typeof document === 'undefined') return
+  if (document.getElementById('fleet-animations')) return
+  
+  const style = document.createElement('style')
+  style.id = 'fleet-animations'
+  style.textContent = `
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    @keyframes bounce-message {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+    @keyframes flame {
+      0%, 100% { transform: scaleY(1) scaleX(1); }
+      50% { transform: scaleY(1.2) scaleX(0.9); }
+    }
+    @keyframes float-emoji {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-60px) scale(1.5); }
+    }
+    @keyframes confetti {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100px) rotate(720deg); opacity: 0; }
+    }
+    @keyframes car-bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+    .bounce-message {
+      animation: bounce-message 2s ease-in-out infinite;
+    }
+    .flame-effect {
+      animation: flame 0.3s ease-in-out infinite;
+    }
+    .float-emoji {
+      animation: float-emoji 2s ease-out forwards;
+    }
+    .confetti-piece {
+      animation: confetti 1s ease-out forwards;
+    }
+    .car-bounce {
+      animation: car-bounce 1s ease-in-out infinite;
+    }
+  `
+  document.head.appendChild(style)
 }
 
-// Custom car/avatar icon with message bubble
+// Create animated vehicle icon with all effects
 const createVehicleIcon = (vehicle: VehicleLocation) => {
-  const color = vehicle.status === "active" ? "#22c55e" : vehicle.status === "idle" ? "#eab308" : "#ef4444"
+  const statusColor = vehicle.status === "active" ? "#22c55e" : vehicle.status === "idle" ? "#eab308" : "#ef4444"
   const deliveryColor = deliveryColors[vehicle.deliveryStatus || "none"]
+  const carColor = vehicle.carColor || "#0ea5e9"
   const hasMessage = vehicle.message && vehicle.status !== "offline"
+  const isMoving = vehicle.status === "active" && vehicle.speed > 5
+  const isDelivered = vehicle.deliveryStatus === "delivered"
+  const hasFloatingEmoji = vehicle.floatingEmoji
   
+  // Get avatar display
+  let avatarContent = ""
+  if (vehicle.avatarType === "emoji" && vehicle.avatar) {
+    avatarContent = vehicle.avatar
+  } else if (vehicle.name) {
+    avatarContent = vehicle.name.charAt(0).toUpperCase()
+  }
+
   return L.divIcon({
     html: `
-      <div style="position: relative; transform: rotate(0deg);">
-        ${hasMessage ? `
-          <div class="message-bubble" style="
+      <div style="position: relative;">
+        <!-- Radar Pulse Effect -->
+        <div class="pulse-ring" style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 60px;
+          height: 60px;
+          margin: -30px 0 0 -30px;
+          border-radius: 50%;
+          border: 2px solid ${carColor};
+          pointer-events: none;
+        "></div>
+        
+        <!-- Floating Emoji -->
+        ${hasFloatingEmoji ? `
+          <div class="float-emoji" style="
             position: absolute;
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background: #0ea5e9;
+            font-size: 28px;
+            z-index: 110;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+          ">${vehicle.floatingEmoji}</div>
+        ` : ''}
+        
+        <!-- Confetti for Delivered -->
+        ${isDelivered ? `
+          <div style="position: absolute; top: -20px; left: 50%; transform: translateX(-50%); pointer-events: none;">
+            ${['#22c55e', '#eab308', '#3b82f6', '#ef4444', '#a855f7'].map((c, i) => `
+              <div class="confetti-piece" style="
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background: ${c};
+                border-radius: 2px;
+                left: ${(i - 2) * 12}px;
+                animation-delay: ${i * 0.1}s;
+              "></div>
+            `).join('')}
+          </div>
+        ` : ''}
+        
+        <!-- Message Bubble -->
+        ${hasMessage ? `
+          <div class="bounce-message" style="
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, ${carColor} 0%, ${carColor}dd 100%);
             color: white;
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
             white-space: nowrap;
-            animation: bounce 2s ease-in-out infinite;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 4px 20px ${carColor}66;
             z-index: 100;
+            margin-bottom: 8px;
           ">
             ${vehicle.message}
             <div style="
               position: absolute;
-              bottom: -6px;
+              bottom: -8px;
               left: 50%;
               transform: translateX(-50%);
               width: 0;
               height: 0;
-              border-left: 6px solid transparent;
-              border-right: 6px solid transparent;
-              border-top: 6px solid #0ea5e9;
+              border-left: 8px solid transparent;
+              border-right: 8px solid transparent;
+              border-top: 8px solid ${carColor};
             "></div>
           </div>
         ` : ''}
-        <div style="
-          width: 48px;
-          height: 48px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, ${color} 0%, ${color}dd 100%);
-          border: 3px solid ${deliveryColor};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 4px 12px ${color}66;
-          position: relative;
-        ">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-          </svg>
+        
+        <!-- Main Vehicle Container -->
+        <div class="${isMoving ? 'car-bounce' : ''}" style="position: relative;">
+          <!-- Speed Flames -->
+          ${isMoving && vehicle.speed > 10 ? `
+            <div class="flame-effect" style="
+              position: absolute;
+              left: -12px;
+              top: 50%;
+              transform: translateY(-50%);
+              font-size: 20px;
+              opacity: ${Math.min(vehicle.speed / 30, 1)};
+            ">🔥</div>
+          ` : ''}
+          
+          <!-- Vehicle Circle -->
           <div style="
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 14px;
-            height: 14px;
-            background: ${vehicle.clockedIn ? '#22c55e' : '#71717a'};
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            border: 2px solid #111113;
+            background: linear-gradient(135deg, ${carColor} 0%, ${carColor}cc 100%);
+            border: 4px solid ${deliveryColor};
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 4px 20px ${carColor}66, 0 0 0 4px ${statusColor}44;
+            position: relative;
+            font-size: ${vehicle.avatarType === 'emoji' ? '28px' : '20px'};
+            color: white;
+            font-weight: bold;
           ">
-            <svg width="8" height="8" viewBox="0 0 24 24" fill="white">
-              <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
-              <path d="M12 6v6l4 2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
-            </svg>
+            ${avatarContent}
+            
+            <!-- Status Indicator -->
+            <div style="
+              position: absolute;
+              top: -4px;
+              right: -4px;
+              width: 18px;
+              height: 18px;
+              background: ${statusColor};
+              border-radius: 50%;
+              border: 3px solid #111113;
+              ${vehicle.status === 'active' ? 'animation: pulse 2s infinite;' : ''}
+            "></div>
+            
+            <!-- Clock Badge -->
+            ${vehicle.clockedIn ? `
+              <div style="
+                position: absolute;
+                bottom: -4px;
+                right: -4px;
+                width: 18px;
+                height: 18px;
+                background: #22c55e;
+                border-radius: 50%;
+                border: 3px solid #111113;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 10px;
+              ">✓</div>
+            ` : ''}
           </div>
+          
+          <!-- Direction Arrow -->
+          <div style="
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(${vehicle.heading || 0}deg);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 12px solid ${carColor};
+          "></div>
         </div>
-        <div style="
-          position: absolute;
-          bottom: -4px;
-          left: 50%;
-          transform: translateX(-50%) rotate(${vehicle.heading || 0}deg);
-          width: 0;
-          height: 0;
-          border-left: 6px solid transparent;
-          border-right: 6px solid transparent;
-          border-top: 8px solid ${color};
-        "></div>
+        
+        <!-- Trail dots indicator -->
+        ${vehicle.trail && vehicle.trail.length > 3 ? `
+          <div style="
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 3px;
+          ">
+            <div style="width: 4px; height: 4px; border-radius: 50%; background: ${carColor}88;"></div>
+            <div style="width: 4px; height: 4px; border-radius: 50%; background: ${carColor}66;"></div>
+            <div style="width: 4px; height: 4px; border-radius: 50%; background: ${carColor}44;"></div>
+          </div>
+        ` : ''}
       </div>
     `,
     className: "vehicle-marker",
-    iconSize: [48, 80],
-    iconAnchor: [24, 48],
+    iconSize: [56, 100],
+    iconAnchor: [28, 56],
   })
 }
 
-interface DemoGateProps {
-  onUnlock: () => void
-}
-
-function DemoGate({ onUnlock }: DemoGateProps) {
+// Floating Lead Capture Form
+function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string) => void }) {
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState("")
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email) {
-      setError("Email is required")
-      return
-    }
+    if (!email) return
     
     setIsSubmitting(true)
-    setError("")
-    
     try {
-      const res = await fetch("/api/leads", {
+      await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, name, source: "fleet-demo" }),
       })
-      
-      if (res.ok) {
-        localStorage.setItem("swatech-demo-unlocked", "true")
-        onUnlock()
-      } else {
-        setError("Something went wrong. Please try again.")
-      }
+      setIsSubmitted(true)
+      localStorage.setItem("swatech-demo-lead", email)
+      onSubmit(email, name)
     } catch {
-      setError("Something went wrong. Please try again.")
+      // Still show success for demo
+      setIsSubmitted(true)
+      onSubmit(email, name)
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/95 backdrop-blur-md z-20 p-6">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-6">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <Navigation className="w-7 h-7 text-primary" />
+  if (isSubmitted) {
+    return (
+      <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 backdrop-blur-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-green-500" />
           </div>
-          <h3 className="text-xl font-bold text-foreground">Watch the Live Demo</h3>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Enter your email to unlock real-time fleet tracking
-          </p>
+          <div>
+            <p className="font-semibold text-green-500">You're in!</p>
+            <p className="text-xs text-green-500/70">Open /driver on your phone to test</p>
+          </div>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name (optional)"
-              className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-            />
-          </div>
-          <div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full px-4 py-2.5 rounded-lg bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-            />
-          </div>
-          {error && <p className="text-xs text-destructive">{error}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-semibold text-sm transition-all hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {isSubmitting ? (
-              "Unlocking..."
-            ) : (
-              <>
-                <Mail className="w-4 h-4" />
-                Unlock Live Demo
-              </>
-            )}
-          </button>
-        </form>
-        
-        <p className="mt-4 text-[10px] text-muted-foreground/60 text-center">
-          We respect your privacy. No spam, ever.
-        </p>
       </div>
-    </div>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-card/80 border border-border rounded-2xl p-4 backdrop-blur-sm space-y-3">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+        <p className="text-xs font-medium text-foreground">Try the live demo</p>
+      </div>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Your name"
+        className="w-full px-3 py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+      />
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="your@email.com"
+        required
+        className="w-full px-3 py-2 rounded-lg bg-secondary/80 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+      />
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-2.5 rounded-lg bg-primary text-primary-foreground font-medium text-sm transition-all hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+      >
+        {isSubmitting ? (
+          "Sending..."
+        ) : (
+          <>
+            <Send className="w-4 h-4" />
+            Get Demo Access
+          </>
+        )}
+      </button>
+      <p className="text-[10px] text-muted-foreground/60 text-center">
+        No spam. We'll send you the driver app link.
+      </p>
+    </form>
   )
 }
 
@@ -217,17 +359,22 @@ export function Hero() {
   const [currentWord, setCurrentWord] = useState(0)
   const [isVisible, setIsVisible] = useState(true)
   const [vehicles, setVehicles] = useState<VehicleLocation[]>([])
-  const [selectedVehicle, setSelectedVehicle] = useState<VehicleLocation | null>(null)
-  const [demoUnlocked, setDemoUnlocked] = useState(false)
+  const [hasSubmittedLead, setHasSubmittedLead] = useState(false)
   const mapRef = useRef<L.Map | null>(null)
   const markersRef = useRef<Map<string, L.Marker>>(new Map())
+  const trailLayersRef = useRef<Map<string, L.Polyline>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Check if demo was previously unlocked
+  // Inject CSS animations
   useEffect(() => {
-    const unlocked = localStorage.getItem("swatech-demo-unlocked")
-    if (unlocked === "true") {
-      setDemoUnlocked(true)
+    injectStyles()
+  }, [])
+
+  // Check if already submitted
+  useEffect(() => {
+    const savedLead = localStorage.getItem("swatech-demo-lead")
+    if (savedLead) {
+      setHasSubmittedLead(true)
     }
   }, [])
 
@@ -257,17 +404,16 @@ export function Hero() {
   }, [])
 
   useEffect(() => {
-    if (!demoUnlocked) return
     fetchVehicles()
     const interval = setInterval(fetchVehicles, 2000)
     return () => clearInterval(interval)
-  }, [fetchVehicles, demoUnlocked])
+  }, [fetchVehicles])
 
   // Initialize map
   useEffect(() => {
-    if (!containerRef.current || mapRef.current || !demoUnlocked) return
+    if (!containerRef.current || mapRef.current) return
 
-    const defaultCenter: [number, number] = [27.9506, -82.4572]
+    const defaultCenter: [number, number] = [27.9506, -82.4572] // Tampa
     
     mapRef.current = L.map(containerRef.current, {
       center: defaultCenter,
@@ -288,71 +434,137 @@ export function Hero() {
         mapRef.current = null
       }
     }
-  }, [demoUnlocked])
+  }, [])
 
-  // Update markers
+  // Update markers and trails
   useEffect(() => {
     if (!mapRef.current) return
 
     const currentVehicleIds = new Set(vehicles.map(v => v.id))
 
+    // Remove old markers and trails
     markersRef.current.forEach((marker, id) => {
       if (!currentVehicleIds.has(id)) {
         marker.remove()
         markersRef.current.delete(id)
       }
     })
+    trailLayersRef.current.forEach((trail, id) => {
+      if (!currentVehicleIds.has(id)) {
+        trail.remove()
+        trailLayersRef.current.delete(id)
+      }
+    })
 
     vehicles.forEach((vehicle) => {
-      const existingMarker = markersRef.current.get(vehicle.id)
       const position: [number, number] = [vehicle.lat, vehicle.lng]
 
+      // Update or create trail
+      if (vehicle.trail && vehicle.trail.length > 1) {
+        const trailCoords: [number, number][] = vehicle.trail.map(p => [p.lat, p.lng])
+        const existingTrail = trailLayersRef.current.get(vehicle.id)
+        
+        if (existingTrail) {
+          existingTrail.setLatLngs(trailCoords)
+        } else {
+          const trailLine = L.polyline(trailCoords, {
+            color: vehicle.carColor || '#0ea5e9',
+            weight: 3,
+            opacity: 0.5,
+            dashArray: '10, 10',
+          }).addTo(mapRef.current!)
+          trailLayersRef.current.set(vehicle.id, trailLine)
+        }
+      }
+
+      // Create popup content
+      const milesProgress = vehicle.totalMiles && vehicle.dailyMilesGoal 
+        ? Math.min((vehicle.totalMiles / vehicle.dailyMilesGoal) * 100, 100) 
+        : 0
+
       const popupContent = `
-        <div style="font-family: system-ui; min-width: 200px; padding: 4px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-            <div style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); display: flex; align-items: center; justify-content: center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
-              </svg>
+        <div style="font-family: system-ui; min-width: 220px; padding: 4px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+            <div style="
+              width: 44px; 
+              height: 44px; 
+              border-radius: 12px; 
+              background: linear-gradient(135deg, ${vehicle.carColor || '#0ea5e9'} 0%, ${vehicle.carColor || '#0ea5e9'}cc 100%);
+              display: flex; 
+              align-items: center; 
+              justify-content: center;
+              font-size: ${vehicle.avatarType === 'emoji' ? '24px' : '18px'};
+              color: white;
+              font-weight: bold;
+            ">
+              ${vehicle.avatarType === 'emoji' && vehicle.avatar ? vehicle.avatar : (vehicle.name?.charAt(0).toUpperCase() || '?')}
             </div>
             <div>
-              <p style="font-weight: 700; margin: 0; font-size: 14px; color: #fff;">${vehicle.name}</p>
-              <p style="color: ${
-                vehicle.status === "active" ? "#22c55e" : 
-                vehicle.status === "idle" ? "#eab308" : "#ef4444"
-              }; font-size: 11px; margin: 0; font-weight: 600;">${vehicle.status.toUpperCase()}</p>
+              <p style="font-weight: 700; margin: 0; font-size: 15px; color: #fff;">${vehicle.name}</p>
+              <div style="display: flex; align-items: center; gap: 6px; margin-top: 2px;">
+                <span style="
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 50%;
+                  background: ${vehicle.status === "active" ? "#22c55e" : vehicle.status === "idle" ? "#eab308" : "#ef4444"};
+                "></span>
+                <span style="color: #71717a; font-size: 11px; text-transform: uppercase; font-weight: 600;">
+                  ${vehicle.status}
+                </span>
+                ${vehicle.streak && vehicle.streak > 0 ? `<span style="color: #f97316; font-size: 11px;">🔥 ${vehicle.streak}</span>` : ''}
+              </div>
             </div>
           </div>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-            <div style="background: #1a1a1f; padding: 8px; border-radius: 8px;">
-              <p style="color: #71717a; font-size: 10px; margin: 0;">Speed</p>
-              <p style="color: #fff; font-size: 13px; font-weight: 600; margin: 2px 0 0 0;">${(vehicle.speed * 2.237).toFixed(1)} mph</p>
+            <div style="background: #1a1a1f; padding: 10px; border-radius: 10px;">
+              <p style="color: #71717a; font-size: 10px; margin: 0; text-transform: uppercase;">Speed</p>
+              <p style="color: #fff; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
+                ${(vehicle.speed * 2.237).toFixed(0)} 
+                <span style="font-size: 10px; color: #71717a; font-weight: 400;">mph</span>
+                ${vehicle.speed * 2.237 > 30 ? ' 🔥' : ''}
+              </p>
             </div>
-            <div style="background: #1a1a1f; padding: 8px; border-radius: 8px;">
-              <p style="color: #71717a; font-size: 10px; margin: 0;">Miles Today</p>
-              <p style="color: #fff; font-size: 13px; font-weight: 600; margin: 2px 0 0 0;">${(vehicle.totalMiles || 0).toFixed(1)} mi</p>
+            <div style="background: #1a1a1f; padding: 10px; border-radius: 10px;">
+              <p style="color: #71717a; font-size: 10px; margin: 0; text-transform: uppercase;">Miles Today</p>
+              <p style="color: #fff; font-size: 18px; font-weight: 700; margin: 2px 0 0 0;">
+                ${(vehicle.totalMiles || 0).toFixed(1)}
+              </p>
+              <div style="height: 3px; background: #27272a; border-radius: 2px; margin-top: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${milesProgress}%; background: ${vehicle.carColor || '#0ea5e9'};"></div>
+              </div>
             </div>
           </div>
           
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <div style="flex: 1; background: ${deliveryColors[vehicle.deliveryStatus || "none"]}22; padding: 6px 10px; border-radius: 6px; border: 1px solid ${deliveryColors[vehicle.deliveryStatus || "none"]}44;">
-              <p style="color: ${deliveryColors[vehicle.deliveryStatus || "none"]}; font-size: 11px; font-weight: 600; margin: 0; text-align: center;">
-                ${deliveryLabels[vehicle.deliveryStatus || "none"]}
+          <div style="display: flex; gap: 6px; margin-bottom: 12px;">
+            <div style="flex: 1; background: ${deliveryColors[vehicle.deliveryStatus || "none"]}22; padding: 8px; border-radius: 8px; border: 1px solid ${deliveryColors[vehicle.deliveryStatus || "none"]}44; text-align: center;">
+              <p style="color: ${deliveryColors[vehicle.deliveryStatus || "none"]}; font-size: 11px; font-weight: 600; margin: 0;">
+                ${vehicle.deliveryStatus === 'delivered' ? '✅ Delivered' : vehicle.deliveryStatus === 'in-transit' ? '🚚 In Transit' : vehicle.deliveryStatus === 'pickup' ? '📥 Pickup' : '📭 No Delivery'}
               </p>
             </div>
-            <div style="flex: 1; background: ${vehicle.clockedIn ? '#22c55e' : '#71717a'}22; padding: 6px 10px; border-radius: 6px; border: 1px solid ${vehicle.clockedIn ? '#22c55e' : '#71717a'}44;">
-              <p style="color: ${vehicle.clockedIn ? '#22c55e' : '#71717a'}; font-size: 11px; font-weight: 600; margin: 0; text-align: center;">
-                ${vehicle.clockedIn ? 'Clocked In' : 'Clocked Out'}
+            <div style="flex: 1; background: ${vehicle.clockedIn ? '#22c55e' : '#71717a'}22; padding: 8px; border-radius: 8px; border: 1px solid ${vehicle.clockedIn ? '#22c55e' : '#71717a'}44; text-align: center;">
+              <p style="color: ${vehicle.clockedIn ? '#22c55e' : '#71717a'}; font-size: 11px; font-weight: 600; margin: 0;">
+                ${vehicle.clockedIn ? '✓ Clocked In' : 'Clocked Out'}
               </p>
             </div>
           </div>
+          
+          ${vehicle.achievements && vehicle.achievements.length > 0 ? `
+            <div style="display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap;">
+              ${vehicle.achievements.slice(0, 4).map(a => `
+                <span style="background: #eab30822; padding: 4px 8px; border-radius: 6px; font-size: 12px;">
+                  ${a === 'first_mile' ? '🏃' : a === 'speed_demon' ? '🏎️' : a === 'marathon' ? '🏅' : a === 'streak_3' ? '🔥' : '⭐'}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
           
           ${vehicle.phone ? `
-            <a href="https://wa.me/${vehicle.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(vehicle.name)}%2C%20contacting%20you%20from%20SWATech%20Fleet" 
+            <a href="https://wa.me/${vehicle.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(vehicle.name)}!" 
                target="_blank"
-               style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; padding: 10px 14px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 600;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+               style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; padding: 12px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; transition: all 0.2s;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
               </svg>
               Send WhatsApp
@@ -363,6 +575,8 @@ export function Hero() {
         </div>
       `
 
+      // Update or create marker
+      const existingMarker = markersRef.current.get(vehicle.id)
       if (existingMarker) {
         existingMarker.setLatLng(position)
         existingMarker.setIcon(createVehicleIcon(vehicle))
@@ -373,16 +587,16 @@ export function Hero() {
         })
           .addTo(mapRef.current!)
           .bindPopup(popupContent)
-          .on("click", () => setSelectedVehicle(vehicle))
 
         markersRef.current.set(vehicle.id, marker)
       }
     })
 
-    if (vehicles.length === 1 && !selectedVehicle) {
-      mapRef.current.setView([vehicles[0].lat, vehicles[0].lng], 15)
+    // Center on first vehicle if only one
+    if (vehicles.length === 1) {
+      mapRef.current.setView([vehicles[0].lat, vehicles[0].lng], 14)
     }
-  }, [vehicles, selectedVehicle])
+  }, [vehicles])
 
   const activeCount = vehicles.filter(v => v.status === "active").length
   const totalCount = vehicles.length
@@ -459,7 +673,7 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right Column - Live Map */}
+          {/* Right Column - Live Map (Always Visible) */}
           <div className="relative flex flex-col gap-4">
             {/* Demo Label */}
             <div className="flex items-center justify-between">
@@ -468,150 +682,79 @@ export function Hero() {
                   <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-xs font-semibold text-primary">LIVE DEMO</span>
                 </div>
-                <span className="text-sm text-muted-foreground">Real-time Fleet Tracking</span>
+                <span className="text-xs text-muted-foreground">
+                  Real-time Fleet Tracking
+                </span>
               </div>
-              {totalCount > 0 && demoUnlocked && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Navigation className="h-3 w-3 text-green-500" />
-                  <span>{activeCount} of {totalCount} active</span>
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Navigation className="w-3 h-3 text-primary" />
+                {activeCount}/{totalCount} active
+              </div>
+            </div>
+
+            {/* Map Container - Always Visible */}
+            <div className="relative h-[400px] lg:h-[500px] rounded-2xl border border-border bg-card overflow-hidden shadow-2xl shadow-primary/5">
+              {/* Map */}
+              <div ref={containerRef} className="absolute inset-0 z-0" />
+              
+              {/* Floating Lead Form */}
+              <div className="absolute top-4 right-4 z-10 w-64">
+                {!hasSubmittedLead ? (
+                  <LeadCaptureForm onSubmit={() => setHasSubmittedLead(true)} />
+                ) : (
+                  <div className="bg-card/80 border border-border rounded-2xl p-3 backdrop-blur-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <p className="text-xs text-foreground">Demo unlocked!</p>
+                    </div>
+                    <a 
+                      href="/driver" 
+                      target="_blank"
+                      className="mt-2 block w-full py-2 px-3 rounded-lg bg-primary/10 text-primary text-xs font-medium text-center hover:bg-primary/20 transition-all"
+                    >
+                      Open Driver App
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Empty State */}
+              {vehicles.length === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                  <div className="text-center p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-border">
+                    <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4 animate-bounce" style={{ animationDuration: "2s" }}>
+                      <Navigation className="w-8 h-8 text-primary" />
+                    </div>
+                    <p className="font-medium text-foreground">Waiting for vehicles...</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Open /driver on your phone to start
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Stats Overlay */}
+              {vehicles.length > 0 && (
+                <div className="absolute bottom-4 left-4 z-10 flex gap-2">
+                  <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
+                    <p className="text-[10px] text-muted-foreground uppercase">Vehicles</p>
+                    <p className="text-lg font-bold text-foreground">{totalCount}</p>
+                  </div>
+                  <div className="bg-card/80 backdrop-blur-sm border border-border rounded-lg px-3 py-2">
+                    <p className="text-[10px] text-muted-foreground uppercase">Active</p>
+                    <p className="text-lg font-bold text-green-500">{activeCount}</p>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Map Container */}
-            <div className="relative h-[400px] lg:h-[480px] w-full overflow-hidden rounded-2xl border border-border/50 bg-card shadow-2xl shadow-primary/5">
-              {!demoUnlocked ? (
-                <DemoGate onUnlock={() => setDemoUnlocked(true)} />
-              ) : (
-                <>
-                  <div ref={containerRef} className="absolute inset-0" />
-                  
-                  {/* Overlay when no vehicles */}
-                  {vehicles.length === 0 && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-card/90 backdrop-blur-sm z-10">
-                      <MapPin className="h-12 w-12 text-primary/40 mb-4" />
-                      <p className="text-sm font-medium text-foreground mb-1">No drivers connected</p>
-                      <p className="text-xs text-muted-foreground mb-4">Waiting for real-time location data...</p>
-                      <a 
-                        href="/driver" 
-                        target="_blank"
-                        className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                      >
-                        <Phone className="h-3 w-3" />
-                        Connect Your Phone
-                      </a>
-                    </div>
-                  )}
-                  
-                  {/* Vehicle List Overlay */}
-                  {vehicles.length > 0 && (
-                    <div className="absolute top-3 left-3 z-20 max-h-[280px] overflow-y-auto rounded-xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg">
-                      <div className="p-2 space-y-1">
-                        {vehicles.map((vehicle) => (
-                          <button
-                            key={vehicle.id}
-                            onClick={() => {
-                              setSelectedVehicle(vehicle)
-                              if (mapRef.current) {
-                                mapRef.current.setView([vehicle.lat, vehicle.lng], 16, { animate: true })
-                                const marker = markersRef.current.get(vehicle.id)
-                                if (marker) marker.openPopup()
-                              }
-                            }}
-                            className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors hover:bg-secondary ${
-                              selectedVehicle?.id === vehicle.id ? "bg-secondary" : ""
-                            }`}
-                          >
-                            <div className={`h-2.5 w-2.5 rounded-full ${
-                              vehicle.status === "active" ? "bg-green-500" : 
-                              vehicle.status === "idle" ? "bg-yellow-500" : "bg-red-500"
-                            }`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-foreground truncate">{vehicle.name}</p>
-                              <div className="flex items-center gap-2 mt-0.5">
-                                <span className="text-[10px] text-muted-foreground">{(vehicle.speed * 2.237).toFixed(0)} mph</span>
-                                <span className="text-[10px] text-muted-foreground">|</span>
-                                <span className="text-[10px] text-muted-foreground">{(vehicle.totalMiles || 0).toFixed(1)} mi</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              {vehicle.deliveryStatus && vehicle.deliveryStatus !== "none" && (
-                                <Package className="h-3 w-3" style={{ color: deliveryColors[vehicle.deliveryStatus] }} />
-                              )}
-                              {vehicle.clockedIn && (
-                                <Clock className="h-3 w-3 text-green-500" />
-                              )}
-                              {vehicle.phone && (
-                                <a
-                                  href={`https://wa.me/${vehicle.phone.replace(/[^0-9]/g, '')}?text=Hi%20${encodeURIComponent(vehicle.name)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="flex items-center justify-center h-6 w-6 rounded-full bg-green-500/20 text-green-500 hover:bg-green-500/30 transition-colors"
-                                >
-                                  <MessageCircle className="h-3 w-3" />
-                                </a>
-                              )}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Driver link */}
-            {demoUnlocked && (
-              <p className="text-center text-xs text-muted-foreground">
-                Open <a href="/driver" target="_blank" className="text-primary hover:underline font-medium">/driver</a> on your phone to connect
-              </p>
-            )}
+            {/* Footer Note */}
+            <p className="text-xs text-muted-foreground/60 text-center">
+              This is a working demo. Vehicles update in real-time every 2 seconds.
+            </p>
           </div>
         </div>
       </div>
-
-      {/* Map Styles */}
-      <style jsx global>{`
-        .vehicle-marker {
-          background: transparent;
-          border: none;
-        }
-        .leaflet-popup-content-wrapper {
-          background: #111113;
-          color: #fff;
-          border-radius: 12px;
-          border: 1px solid #27272a;
-          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-        .leaflet-popup-tip {
-          background: #111113;
-        }
-        .leaflet-control-zoom a {
-          background: #111113 !important;
-          color: #fff !important;
-          border-color: #27272a !important;
-        }
-        .leaflet-control-zoom a:hover {
-          background: #1a1a1f !important;
-        }
-        .leaflet-control-attribution {
-          background: rgba(17,17,19,0.8) !important;
-          color: #52525b !important;
-          font-size: 9px !important;
-        }
-        .leaflet-control-attribution a {
-          color: #71717a !important;
-        }
-        @keyframes bounce {
-          0%, 100% { transform: translateX(-50%) translateY(0); }
-          50% { transform: translateX(-50%) translateY(-8px); }
-        }
-        .message-bubble {
-          animation: bounce 2s ease-in-out infinite;
-        }
-      `}</style>
     </section>
   )
 }

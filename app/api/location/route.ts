@@ -10,7 +10,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { 
       id, name, lat, lng, speed = 0, heading = 0, phone,
-      avatar, deliveryStatus, clockedIn, clockInTime, totalMiles, message
+      avatar, avatarType, carBrand, carColor,
+      deliveryStatus, clockedIn, clockInTime, totalMiles, dailyMilesGoal,
+      message, floatingEmoji, streak, totalDeliveries, achievements, trail
     } = body
 
     if (!id || !name || lat === undefined || lng === undefined) {
@@ -31,11 +33,20 @@ export async function POST(request: NextRequest) {
       status: "active",
       phone: phone || undefined,
       avatar: avatar || undefined,
+      avatarType: avatarType || "initials",
+      carBrand: carBrand || undefined,
+      carColor: carColor || "#0ea5e9",
       deliveryStatus: deliveryStatus || "none",
       clockedIn: clockedIn ?? false,
       clockInTime: clockInTime || undefined,
       totalMiles: totalMiles || 0,
+      dailyMilesGoal: dailyMilesGoal || 100,
       message: message || undefined,
+      floatingEmoji: floatingEmoji || undefined,
+      streak: streak || 0,
+      totalDeliveries: totalDeliveries || 0,
+      achievements: achievements || [],
+      trail: trail || [],
     }
 
     // Store in Redis hash with expiry handling via sorted set
