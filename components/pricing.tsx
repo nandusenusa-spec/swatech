@@ -3,6 +3,7 @@
 import { Check, Zap } from "lucide-react"
 import { useState } from "react"
 import { Checkout } from "./checkout"
+import { FadeInSection } from "@/hooks/use-scroll-animation"
 
 // Map plan names to Stripe product IDs
 const PLAN_PRODUCT_IDS: Record<string, { monthly: string; yearly: string }> = {
@@ -153,15 +154,15 @@ export function Pricing() {
 
         {/* Cards */}
         <div className="mt-16 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative flex flex-col rounded-xl border p-8 transition-all ${
-                plan.highlight
-                  ? "border-primary bg-primary/5 shadow-[0_0_40px_-12px_rgba(14,165,233,0.15)]"
-                  : "border-border/50 bg-card hover:border-primary/20"
-              }`}
-            >
+          {plans.map((plan, index) => (
+            <FadeInSection key={plan.name} delay={index * 100}>
+              <div
+                className={`relative flex flex-col rounded-xl border p-8 transition-all card-hover h-full ${
+                  plan.highlight
+                    ? "border-primary bg-primary/5 shadow-[0_0_40px_-12px_rgba(14,165,233,0.15)] glow-hover"
+                    : "border-border/50 bg-card hover:border-primary/20"
+                }`}
+              >
               {plan.highlight && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                   <div className="flex items-center gap-1 rounded-full bg-primary px-3 py-1">
@@ -202,7 +203,7 @@ export function Pricing() {
               {/* CTA */}
               <button
                 onClick={() => handleGetStarted(plan.name)}
-                className={`mt-6 flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-all cursor-pointer ${
+                className={`mt-6 flex items-center justify-center rounded-lg px-6 py-3 text-sm font-semibold transition-all cursor-pointer btn-hover ${
                   plan.highlight
                     ? "bg-primary text-primary-foreground hover:bg-primary/90"
                     : "border border-border bg-secondary text-secondary-foreground hover:bg-border"
@@ -223,7 +224,8 @@ export function Pricing() {
                   </li>
                 ))}
               </ul>
-            </div>
+              </div>
+            </FadeInSection>
           ))}
         </div>
 

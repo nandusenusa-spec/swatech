@@ -1,4 +1,7 @@
+"use client"
+
 import { MessageSquare, Paintbrush, Rocket, Headphones } from "lucide-react"
+import { FadeInSection } from "@/hooks/use-scroll-animation"
 
 const steps = [
   {
@@ -51,27 +54,29 @@ export function HowItWorks() {
         {/* Steps */}
         <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (
-            <div key={step.number} className="relative flex flex-col">
-              {/* Connector line (desktop only) */}
-              {index < steps.length - 1 && (
-                <div className="pointer-events-none absolute right-0 top-10 hidden h-px w-full translate-x-1/2 bg-gradient-to-r from-primary/30 to-transparent lg:block" />
-              )}
+            <FadeInSection key={step.number} delay={index * 150}>
+              <div className="relative flex flex-col group">
+                {/* Connector line (desktop only) */}
+                {index < steps.length - 1 && (
+                  <div className="pointer-events-none absolute right-0 top-10 hidden h-px w-full translate-x-1/2 bg-gradient-to-r from-primary/30 to-transparent lg:block" />
+                )}
 
-              <div className="flex flex-col items-start">
-                <div className="relative mb-6">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/20 bg-primary/5">
-                    <step.icon className="h-6 w-6 text-primary" />
+                <div className="flex flex-col items-start">
+                  <div className="relative mb-6">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/20 bg-primary/5 transition-all group-hover:bg-primary/10 group-hover:scale-110 group-hover:border-primary/40">
+                      <step.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground transition-transform group-hover:scale-110">
+                      {step.number}
+                    </span>
                   </div>
-                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                    {step.number}
-                  </span>
+                  <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {step.description}
-                </p>
               </div>
-            </div>
+            </FadeInSection>
           ))}
         </div>
       </div>

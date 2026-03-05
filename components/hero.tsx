@@ -84,12 +84,25 @@ const createVehicleIcon = (vehicle: VehicleLocation) => {
   const isDelivered = vehicle.deliveryStatus === "delivered"
   const hasFloatingEmoji = vehicle.floatingEmoji
   
-  // Get avatar display
-  let avatarContent = ""
+  // Get avatar display - always show car emoji by default
+  let avatarContent = "🚗" // Default car emoji
   if (vehicle.avatarType === "emoji" && vehicle.avatar) {
     avatarContent = vehicle.avatar
-  } else if (vehicle.name) {
-    avatarContent = vehicle.name.charAt(0).toUpperCase()
+  } else if (vehicle.carBrand) {
+    // Show brand-specific vehicle emoji
+    const brandEmojis: Record<string, string> = {
+      "Toyota": "🚙",
+      "Ford": "🚙",
+      "Honda": "🚗",
+      "Tesla": "🚘",
+      "Chevrolet": "🚙",
+      "Van": "🚐",
+      "Truck": "🛻",
+      "Motorcycle": "🏍️",
+      "Bike": "🚲",
+      "SUV": "🚙",
+    }
+    avatarContent = brandEmojis[vehicle.carBrand] || "🚗"
   }
 
   return L.divIcon({

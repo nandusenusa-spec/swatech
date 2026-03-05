@@ -33,7 +33,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="relative text-sm text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all after:duration-300 hover:after:w-full"
             >
               {link.label}
             </a>
@@ -53,7 +53,7 @@ export function Navbar() {
           </a>
           <a
             href="#contact"
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 btn-hover"
           >
             Schedule a Demo
           </a>

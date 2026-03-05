@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
+import { FadeInSection } from "@/hooks/use-scroll-animation"
 
 const faqs = [
   {
@@ -72,32 +73,35 @@ export function FAQ() {
         {/* Accordion */}
         <div className="mt-12 flex flex-col gap-3">
           {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="rounded-xl border border-border/50 bg-card transition-all hover:border-primary/20"
-            >
-              <button
-                className="flex w-full items-center justify-between px-6 py-5 text-left"
-                onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                aria-expanded={openIndex === index}
+            <FadeInSection key={index} delay={index * 50}>
+              <div
+                className="rounded-xl border border-border/50 bg-card transition-all hover:border-primary/20 hover:shadow-lg"
               >
-                <span className="pr-4 text-sm font-medium text-foreground">
-                  {faq.question}
-                </span>
-                <ChevronDown
-                  className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                    openIndex === index ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              {openIndex === index && (
-                <div className="px-6 pb-5">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
-                    {faq.answer}
-                  </p>
+                <button
+                  className="flex w-full items-center justify-between px-6 py-5 text-left"
+                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                  aria-expanded={openIndex === index}
+                >
+                  <span className="pr-4 text-sm font-medium text-foreground">
+                    {faq.question}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+                      openIndex === index ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${
+                  openIndex === index ? "max-h-96" : "max-h-0"
+                }`}>
+                  <div className="px-6 pb-5">
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {faq.answer}
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            </FadeInSection>
           ))}
         </div>
       </div>
