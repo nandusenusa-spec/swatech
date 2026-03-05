@@ -14,4 +14,5 @@ export interface VehicleLocation {
   heading: number
   timestamp: number
   status: "active" | "idle" | "offline"
+  phone?: string
 }

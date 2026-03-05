@@ -6,6 +6,7 @@ import { MapPin, Navigation, Wifi, WifiOff, Car } from "lucide-react"
 export default function DriverPage() {
   const [driverId] = useState(() => `driver-${Math.random().toString(36).substring(2, 8)}`)
   const [driverName, setDriverName] = useState("")
+  const [driverPhone, setDriverPhone] = useState("")
   const [isTracking, setIsTracking] = useState(false)
   const [currentPosition, setCurrentPosition] = useState<GeolocationPosition | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -26,6 +27,7 @@ export default function DriverPage() {
           lng: position.coords.longitude,
           speed: position.coords.speed || 0,
           heading: position.coords.heading || 0,
+          phone: driverPhone || undefined,
         }),
       })
       
@@ -36,7 +38,7 @@ export default function DriverPage() {
     } catch (err) {
       setError("Failed to send location")
     }
-  }, [driverId, driverName])
+  }, [driverId, driverName, driverPhone])
 
   useEffect(() => {
     if (!isTracking || !isRegistered) return
@@ -114,6 +116,22 @@ export default function DriverPage() {
                 placeholder="e.g., John - Truck 01"
                 className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                WhatsApp Number <span className="text-muted-foreground">(optional)</span>
+              </label>
+              <input
+                type="tel"
+                value={driverPhone}
+                onChange={(e) => setDriverPhone(e.target.value)}
+                placeholder="e.g., +1 813 555 1234"
+                className="w-full px-4 py-3 rounded-xl bg-secondary border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                Dispatchers can contact you directly via WhatsApp
+              </p>
             </div>
             
             {error && (
