@@ -2,9 +2,11 @@
 
 import { ArrowRight, Play, Navigation, Mail, Sparkles, Send } from "lucide-react"
 import { useEffect, useState, useRef, useCallback } from "react"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
 import type { VehicleLocation } from "@/lib/redis"
+
+// Leaflet types for TypeScript
+type LeafletMap = import("leaflet").Map
+type LeafletMarker = import("leaflet").Marker
 
 interface HeroProps {
   onAccessGranted?: (email: string) => void
@@ -75,7 +77,7 @@ const injectStyles = () => {
 }
 
 // Create animated vehicle icon with all effects
-const createVehicleIcon = (vehicle: VehicleLocation) => {
+const createVehicleIcon = (vehicle: VehicleLocation, L: typeof import("leaflet")) => {
   const statusColor = vehicle.status === "active" ? "#22c55e" : vehicle.status === "idle" ? "#eab308" : "#ef4444"
   const deliveryColor = deliveryColors[vehicle.deliveryStatus || "none"]
   const carColor = vehicle.carColor || "#0ea5e9"
@@ -489,9 +491,10 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
   const [isVisible, setIsVisible] = useState(true)
   const [vehicles, setVehicles] = useState<VehicleLocation[]>([])
   const [hasSubmittedLead, setHasSubmittedLead] = useState(hasAccess || false)
-  const mapRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<Map<string, L.Marker>>(new Map())
-  const trailLayersRef = useRef<Map<string, L.Polyline>>(new Map())
+  const mapRef = useRef<LeafletMap | null>(null)
+  const markersRef = useRef<Map<string, LeafletMarker>>(new Map())
+  const trailLayersRef = useRef<Map<string, unknown>>(new Map())
+  const leafletRef = useRef<typeof import("leaflet") | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Inject CSS animations
@@ -560,24 +563,33 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
     return () => clearInterval(interval)
   }, [fetchVehicles])
 
-  // Initialize map
+  // Initialize map with dynamic Leaflet import
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
 
-    const defaultCenter: [number, number] = [27.9506, -82.4572] // Tampa
-    
-    mapRef.current = L.map(containerRef.current, {
-      center: defaultCenter,
-      zoom: 12,
-      zoomControl: false,
-    })
+    const initMap = async () => {
+      // Dynamically import Leaflet (client-side only)
+      const L = await import("leaflet")
+      await import("leaflet/dist/leaflet.css")
+      leafletRef.current = L
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; OpenStreetMap',
-      maxZoom: 19,
-    }).addTo(mapRef.current)
+      const defaultCenter: [number, number] = [27.9506, -82.4572] // Tampa
+      
+      mapRef.current = L.map(containerRef.current!, {
+        center: defaultCenter,
+        zoom: 12,
+        zoomControl: false,
+      })
 
-    L.control.zoom({ position: "bottomright" }).addTo(mapRef.current)
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 19,
+      }).addTo(mapRef.current)
+
+      L.control.zoom({ position: "bottomright" }).addTo(mapRef.current)
+    }
+
+    initMap()
 
     return () => {
       if (mapRef.current) {
@@ -589,7 +601,8 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
 
   // Update markers and trails
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef.current || !leafletRef.current) return
+    const L = leafletRef.current
 
     const currentVehicleIds = new Set(vehicles.map(v => v.id))
 
@@ -602,7 +615,7 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
     })
     trailLayersRef.current.forEach((trail, id) => {
       if (!currentVehicleIds.has(id)) {
-        trail.remove()
+        (trail as { remove: () => void }).remove()
         trailLayersRef.current.delete(id)
       }
     })
@@ -613,7 +626,7 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
       // Update or create trail
       if (vehicle.trail && vehicle.trail.length > 1) {
         const trailCoords: [number, number][] = vehicle.trail.map(p => [p.lat, p.lng])
-        const existingTrail = trailLayersRef.current.get(vehicle.id)
+        const existingTrail = trailLayersRef.current.get(vehicle.id) as { setLatLngs: (coords: [number, number][]) => void } | undefined
         
         if (existingTrail) {
           existingTrail.setLatLngs(trailCoords)
@@ -730,11 +743,11 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
       const existingMarker = markersRef.current.get(vehicle.id)
       if (existingMarker) {
         existingMarker.setLatLng(position)
-        existingMarker.setIcon(createVehicleIcon(vehicle))
+        existingMarker.setIcon(createVehicleIcon(vehicle, L))
         existingMarker.setPopupContent(popupContent)
       } else {
         const marker = L.marker(position, {
-          icon: createVehicleIcon(vehicle),
+          icon: createVehicleIcon(vehicle, L),
         })
           .addTo(mapRef.current!)
           .bindPopup(popupContent)
