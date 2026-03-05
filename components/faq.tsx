@@ -30,6 +30,16 @@ const faqs = [
       "We accept all major credit cards (Visa, MasterCard, American Express) through Stripe and PayPal. All plans are billed monthly or annually with no hidden fees.",
   },
   {
+    question: "Are taxes included in the listed prices?",
+    answer:
+      "No. All prices shown on our website are before applicable taxes. Depending on your location, state and local sales taxes may apply. You will always see the final amount including any applicable taxes before confirming your subscription. We provide a full invoice breakdown with every payment.",
+  },
+  {
+    question: "Why do you limit the number of clients?",
+    answer:
+      "We are a boutique agency by choice. By keeping our client roster intentionally small, we guarantee that every project receives our complete focus and attention. This means faster response times, higher quality output, and a true partnership rather than being just another account number.",
+  },
+  {
     question: "What happens if I cancel?",
     answer:
       "You can cancel at any time. Your service will remain active until the end of your current billing period. We can also export your data if you need it. No lock-in contracts.",

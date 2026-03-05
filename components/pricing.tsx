@@ -204,11 +204,11 @@ export function Pricing() {
         </div>
 
         {/* Payment note */}
-        <div className="mt-12 flex flex-col items-center gap-2 text-center">
+        <div className="mt-12 flex flex-col items-center gap-3 text-center">
           <p className="text-sm text-muted-foreground">
             All plans billed via credit card. We accept Visa, MasterCard, and American Express.
           </p>
-          <div className="flex items-center gap-4 mt-2">
+          <div className="flex items-center gap-4 mt-1">
             <div className="flex items-center gap-1.5 rounded-md border border-border/50 bg-secondary px-3 py-1.5">
               <div className="h-5 w-8 rounded bg-[#635BFF] flex items-center justify-center">
                 <span className="text-[8px] font-bold text-[#ffffff]">stripe</span>
@@ -222,6 +222,11 @@ export function Pricing() {
               <span className="text-xs text-muted-foreground">PayPal</span>
             </div>
           </div>
+          <p className="mt-2 max-w-lg text-xs text-muted-foreground/60 leading-relaxed">
+            * Prices shown do not include applicable taxes. Final pricing may vary depending on
+            your location, applicable state and local sales taxes, and any additional services
+            requested. You will see the final amount including taxes before confirming your subscription.
+          </p>
         </div>
       </div>
     </section>
