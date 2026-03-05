@@ -11,8 +11,8 @@ export const PRODUCTS: Product[] = [
   {
     id: "starter-yearly",
     name: "SWATech Starter - Business Contact Page (Annual)",
-    description: "Professional contact page, corporate email, custom domain, 24/7 online visibility",
-    priceInCents: 20000, // $200/year
+    description: "A simple one-page website with your business info, contact details, and location",
+    priceInCents: 19900, // $199/year
     billingType: "yearly",
   },
   // Business - Landing Page Pro
@@ -20,14 +20,14 @@ export const PRODUCTS: Product[] = [
     id: "business-monthly",
     name: "SWATech Business - Landing Page Pro (Monthly)",
     description: "Complete landing page with copywriting, design, conversion optimization, analytics",
-    priceInCents: 6000, // $60/month
+    priceInCents: 5900, // $59/month
     billingType: "monthly",
   },
   {
     id: "business-yearly",
     name: "SWATech Business - Landing Page Pro (Annual)",
     description: "Complete landing page with copywriting, design, conversion optimization, analytics",
-    priceInCents: 60000, // $600/year (save $120)
+    priceInCents: 58900, // $589/year (save ~$119)
     billingType: "yearly",
   },
   // PYMES - Business Systems
@@ -42,7 +42,7 @@ export const PRODUCTS: Product[] = [
     id: "pymes-yearly",
     name: "SWATech PYMES - Business Systems (Annual)",
     description: "Complete management system: CRM, scheduling, inventory, billing, employee management",
-    priceInCents: 169000, // $1,690/year (save ~$338)
+    priceInCents: 169900, // $1,699/year (save ~$329)
     billingType: "yearly",
   },
   // Professional - Advanced Systems
@@ -57,7 +57,7 @@ export const PRODUCTS: Product[] = [
     id: "professional-yearly",
     name: "SWATech Professional - Advanced Systems (Annual)",
     description: "Scalable solutions with API integrations, multi-location, advanced analytics",
-    priceInCents: 399000, // $3,990/year (save ~$798)
+    priceInCents: 399900, // $3,999/year (save ~$789)
     billingType: "yearly",
   },
 ]
