@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { Redis } from "@upstash/redis"
+import { sendVerificationCode } from "@/lib/email"
 
 const redis = new Redis({
   url: process.env.KV_REST_API_URL!,
@@ -54,14 +55,25 @@ export async function POST(request: NextRequest) {
         { ex: 600 } // 10 minutes
       )
 
-      // In production, send email here. For demo, we'll return success and show the code
-      console.log(`[DEMO] Verification code for ${normalizedEmail}: ${verificationCode}`)
+      // Send verification code via email
+      const emailResult = await sendVerificationCode({
+        to: normalizedEmail,
+        code: verificationCode
+      })
+
+      if (!emailResult.success) {
+        console.error(`[DEMO] Failed to send email to ${normalizedEmail}:`, emailResult.error)
+        return NextResponse.json({ 
+          error: "Failed to send verification email. Please try again." 
+        }, { status: 500 })
+      }
+
+      console.log(`[DEMO] Verification code sent to ${normalizedEmail}`)
 
       return NextResponse.json({ 
         success: true, 
-        message: "Verification code sent to your email",
-        // For demo purposes, always include the code so users can test the app
-        demoCode: verificationCode
+        message: "Verification code sent to your email"
+        // Code is NOT returned - user must check their email
       })
     }
 

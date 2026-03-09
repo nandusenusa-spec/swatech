@@ -20,7 +20,6 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
   const [step, setStep] = useState<"email" | "verify" | "success">("email")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [demoCode, setDemoCode] = useState("")
 
   const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,10 +51,6 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, name, source: "fleet-demo" }),
       })
-
-      if (data.demoCode) {
-        setDemoCode(data.demoCode)
-      }
       
       setStep("verify")
     } catch {
@@ -125,14 +120,8 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
           <p className="text-xs font-medium text-foreground">Enter verification code</p>
         </div>
         <p className="text-[10px] text-muted-foreground">
-          We sent a 6-digit code to {email}
+          We sent a 6-digit code to {email}. Check your inbox.
         </p>
-        {demoCode && (
-          <div className="bg-primary/10 border border-primary/30 rounded-lg p-2 text-center">
-            <p className="text-[10px] text-primary/70">Demo code:</p>
-            <p className="text-lg font-mono font-bold text-primary">{demoCode}</p>
-          </div>
-        )}
         <input
           type="text"
           value={verificationCode}
@@ -151,7 +140,7 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         </button>
         <button
           type="button"
-          onClick={() => { setStep("email"); setError(""); setDemoCode("") }}
+          onClick={() => { setStep("email"); setError("") }}
           className="w-full text-[10px] text-muted-foreground hover:text-foreground"
         >
           Use different email
