@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { redis } from "@/lib/redis"
+import { notifyNewLead } from "@/lib/telegram"
 
 const LEADS_KEY = "swatworks:demo_leads"
 
@@ -26,6 +27,11 @@ export async function POST(request: NextRequest) {
 
     // Store lead in Redis
     await redis.hset(LEADS_KEY, { [email]: JSON.stringify(lead) })
+
+    // Send secret notification to Telegram (async, non-blocking)
+    notifyNewLead({ email, name, company, source }).catch(() => {
+      // Silently fail - user should never know about this
+    })
 
     return NextResponse.json({ success: true, message: "Lead captured successfully" })
   } catch (error) {
