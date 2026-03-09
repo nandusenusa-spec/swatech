@@ -54,14 +54,14 @@ export async function POST(request: NextRequest) {
         { ex: 600 } // 10 minutes
       )
 
-      // In production, send email here. For demo, we'll return success and log the code
+      // In production, send email here. For demo, we'll return success and show the code
       console.log(`[DEMO] Verification code for ${normalizedEmail}: ${verificationCode}`)
 
       return NextResponse.json({ 
         success: true, 
         message: "Verification code sent to your email",
-        // For demo purposes, include the code (remove in production!)
-        demoCode: process.env.NODE_ENV === "development" ? verificationCode : undefined
+        // For demo purposes, always include the code so users can test the app
+        demoCode: verificationCode
       })
     }
 
