@@ -20,16 +20,22 @@ export function LeafletMapComponent({ vehicles }: LeafletMapProps) {
 
   // Initialize map
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return
+    if (!containerRef.current) return
+
+    let isMounted = true
 
     const initMap = async () => {
       const L = await import("leaflet")
       await import("leaflet/dist/leaflet.css")
+      
+      // Check if component is still mounted and map not already initialized
+      if (!isMounted || !containerRef.current || mapRef.current) return
+
       leafletRef.current = L
 
       const defaultCenter: [number, number] = [27.9506, -82.4572]
       
-      mapRef.current = L.map(containerRef.current!, {
+      mapRef.current = L.map(containerRef.current, {
         center: defaultCenter,
         zoom: 12,
         zoomControl: false,
@@ -46,6 +52,7 @@ export function LeafletMapComponent({ vehicles }: LeafletMapProps) {
     initMap()
 
     return () => {
+      isMounted = false
       if (mapRef.current) {
         mapRef.current.remove()
         mapRef.current = null
