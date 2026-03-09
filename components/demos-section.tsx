@@ -2,8 +2,21 @@
 
 // SWATech Demo Section - Hero + Inventory demos
 import { useState, useEffect } from "react"
-import { Hero } from "./hero"
+import dynamic from "next/dynamic"
 import { InventoryDemo } from "./inventory-demo"
+
+// Dynamic import Hero to avoid SSR issues with Leaflet
+const Hero = dynamic(() => import("./hero").then(mod => ({ default: mod.Hero })), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Loading demo...</p>
+      </div>
+    </div>
+  ),
+})
 
 export function DemosSection() {
   const [hasAccess, setHasAccess] = useState(false)
