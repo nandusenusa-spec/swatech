@@ -20,9 +20,8 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
   const [step, setStep] = useState<"email" | "verify" | "success">("email")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
-  const [demoCode, setDemoCode] = useState("") // For demo display only
+  const [demoCode, setDemoCode] = useState("")
 
-  // Step 1: Request verification code
   const handleRequestCode = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email) return
@@ -48,14 +47,12 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         return
       }
 
-      // Also save lead
       await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, name, source: "fleet-demo" }),
       })
 
-      // For demo purposes, show the code
       if (data.demoCode) {
         setDemoCode(data.demoCode)
       }
@@ -68,7 +65,6 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
     }
   }
 
-  // Step 2: Verify code
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!verificationCode) return
@@ -90,7 +86,6 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         return
       }
 
-      // Save session info
       localStorage.setItem("swatech-demo-session", JSON.stringify({ 
         email, 
         sessionId: data.sessionId,
@@ -217,16 +212,14 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
   const [vehicles, setVehicles] = useState<VehicleLocation[]>([])
   const [hasSubmittedLead, setHasSubmittedLead] = useState(hasAccess || false)
 
-  // Sync with parent access state
   useEffect(() => {
     if (hasAccess !== undefined) {
       setHasSubmittedLead(hasAccess)
     }
   }, [hasAccess])
 
-  // Check if already submitted (with 24h expiration)
   useEffect(() => {
-    if (hasAccess !== undefined) return // Skip if controlled by parent
+    if (hasAccess !== undefined) return
     
     const savedData = localStorage.getItem("swatech-demo-lead")
     if (savedData) {
@@ -237,17 +230,14 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
         if (now - timestamp < hours24) {
           setHasSubmittedLead(true)
         } else {
-          // Expired, clear it
           localStorage.removeItem("swatech-demo-lead")
         }
       } catch {
-        // Old format without timestamp, clear it
         localStorage.removeItem("swatech-demo-lead")
       }
     }
   }, [hasAccess])
 
-  // Word rotation effect
   useEffect(() => {
     const interval = setInterval(() => {
       setIsVisible(false)
@@ -259,7 +249,6 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
     return () => clearInterval(interval)
   }, [])
 
-  // Fetch vehicles
   const fetchVehicles = useCallback(async () => {
     try {
       const res = await fetch("/api/location")
@@ -283,23 +272,17 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
 
   return (
     <section className="relative min-h-screen overflow-hidden pt-20">
-      {/* Background grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
-      
-      {/* Glow */}
       <div className="pointer-events-none absolute left-1/4 top-0 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
 
       <div className="relative mx-auto max-w-7xl px-6 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left Column - Text */}
           <div className="flex flex-col items-start text-left">
-            {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
               <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
               <span className="text-xs font-medium text-primary">Serving Tampa, FL & Beyond</span>
             </div>
 
-            {/* Main Heading */}
             <h1 className="text-3xl font-bold leading-tight tracking-tight text-foreground sm:text-4xl lg:text-5xl xl:text-6xl text-balance font-mono">
               We Build{" "}
               <span
@@ -313,13 +296,11 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
               <span className="text-muted-foreground">For Your Business</span>
             </h1>
 
-            {/* Subtitle */}
             <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground lg:text-lg text-pretty">
               From a simple landing page to real-time fleet tracking systems.
               We adapt every solution to your exact needs.
             </p>
 
-            {/* CTAs */}
             <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
               <a
                 href="#pricing"
@@ -337,7 +318,6 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
               </a>
             </div>
 
-            {/* Mini Stats */}
             <div className="mt-6 md:mt-10 grid grid-cols-2 gap-4 md:gap-6 sm:grid-cols-4">
               {[
                 { value: "50+", label: "Projects" },
@@ -353,9 +333,7 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
             </div>
           </div>
 
-          {/* Right Column - Live Map (Always Visible) */}
           <div className="relative flex flex-col gap-3 md:gap-4">
-            {/* Demo Label */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <div className="flex items-center gap-2 md:gap-3">
                 <div className="flex items-center gap-1.5 md:gap-2 rounded-full border border-primary/30 bg-primary/10 px-2 md:px-3 py-1">
@@ -372,12 +350,9 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
               </div>
             </div>
 
-            {/* Map Container - Always Visible */}
             <div className="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px] rounded-xl md:rounded-2xl border border-border bg-card overflow-hidden shadow-2xl shadow-primary/5">
-              {/* Map */}
               <DynamicMap vehicles={vehicles} />
               
-              {/* Floating Lead Form - Responsive positioning */}
               <div className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 w-52 sm:w-64">
                 {!hasSubmittedLead ? (
                   <LeadCaptureForm onSubmit={(email) => {
@@ -401,7 +376,6 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
                 )}
               </div>
 
-              {/* Empty State */}
               {vehicles.length === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none p-4">
                   <div className="text-center p-4 md:p-6 rounded-xl md:rounded-2xl bg-card/80 backdrop-blur-sm border border-border max-w-xs">
@@ -416,7 +390,6 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
                 </div>
               )}
 
-              {/* Stats Overlay */}
               {vehicles.length > 0 && (
                 <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 z-10 flex gap-1.5 sm:gap-2">
                   <div className="bg-card/90 backdrop-blur-sm border border-border rounded-lg px-2 sm:px-3 py-1.5 sm:py-2">
@@ -431,7 +404,6 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
               )}
             </div>
 
-            {/* Footer Note */}
             <p className="text-[10px] md:text-xs text-muted-foreground/60 text-center">
               This is a working demo. Vehicles update in real-time every 2 seconds.
             </p>
