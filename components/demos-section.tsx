@@ -6,7 +6,7 @@ import dynamic from "next/dynamic"
 import { InventoryDemo } from "./inventory-demo"
 
 // Dynamic import Hero to avoid SSR issues with Leaflet
-const Hero = dynamic(() => import("./hero").then(mod => ({ default: mod.Hero })), {
+const Hero = dynamic(() => import("./hero-section").then(mod => ({ default: mod.Hero })), {
   ssr: false,
   loading: () => (
     <div className="min-h-screen flex items-center justify-center bg-background">
