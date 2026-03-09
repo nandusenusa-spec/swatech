@@ -6,8 +6,8 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN!,
 })
 
-const SESSION_KEY = "swatech:demo_sessions"
-const VERIFICATION_KEY = "swatech:email_verification"
+const SESSION_KEY = "swatworks:demo_sessions"
+const VERIFICATION_KEY = "swatworks:email_verification"
 const SESSION_TTL = 86400 // 24 hours in seconds
 
 // Generate 6-digit verification code

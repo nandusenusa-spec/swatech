@@ -52,7 +52,7 @@ export function Navbar() {
             <span className="text-sm font-bold text-primary-foreground font-mono">SW</span>
           </div>
           <span className="text-xl font-bold text-foreground tracking-tight">
-            SWA<span className="text-primary">Tech</span>
+            SWAT<span className="text-primary">WORKS</span>
           </span>
         </a>
 

@@ -10,7 +10,7 @@ export function Footer() {
               <span className="text-xs font-bold text-primary-foreground font-mono">SW</span>
             </div>
             <span className="text-lg font-bold text-foreground tracking-tight">
-              SWA<span className="text-primary">Tech</span>
+              SWAT<span className="text-primary">WORKS</span>
             </span>
           </div>
 
@@ -35,19 +35,19 @@ export function Footer() {
         <div className="flex flex-col gap-4 text-center">
           <p className="mx-auto max-w-3xl text-[11px] leading-relaxed text-muted-foreground/50">
             <span className="font-semibold text-muted-foreground/70">Disclaimer:</span>{" "}
-            SWATech provides custom web development and digital solutions services. All prices
+            SWATWORKS provides custom web development and digital solutions services. All prices
             displayed on this website are estimates and do not include applicable federal, state,
             or local taxes. Final pricing may vary based on project scope, additional features
             requested, applicable taxes, and other factors. Services are subject to our terms
-            and conditions. SWATech reserves the right to modify pricing, features, and
+            and conditions. SWATWORKS reserves the right to modify pricing, features, and
             availability at any time without prior notice. Results and timelines may vary
-            depending on the complexity and requirements of each project. SWATech is not
+            depending on the complexity and requirements of each project. SWATWORKS is not
             responsible for third-party services, including but not limited to domain registrars,
             email hosting providers, and payment processors.
           </p>
 
           <p className="mx-auto max-w-2xl text-[11px] leading-relaxed text-muted-foreground/50">
-            SWATech is a boutique digital agency based in Tampa, Florida. All services are
+            SWATWORKS is a boutique digital agency based in Tampa, Florida. All services are
             provided under individual service agreements. By engaging our services you agree
             to the terms outlined in your specific service contract.
           </p>
@@ -59,7 +59,7 @@ export function Footer() {
         {/* Copyright row */}
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} SWATech. All rights reserved.
+            &copy; {new Date().getFullYear()} SWATWORKS. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground">

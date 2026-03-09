@@ -60,10 +60,10 @@ const ACHIEVEMENTS = [
 export default function DriverPage() {
   const [driverId] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('swatech-driver-id')
+      const saved = localStorage.getItem('swatworks-driver-id')
       if (saved) return saved
       const newId = `driver-${Math.random().toString(36).substring(2, 8)}`
-      localStorage.setItem('swatech-driver-id', newId)
+      localStorage.setItem('swatworks-driver-id', newId)
       return newId
     }
     return `driver-${Math.random().toString(36).substring(2, 8)}`
@@ -117,14 +117,14 @@ export default function DriverPage() {
   // Load saved data on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedName = localStorage.getItem('swatech-driver-name')
-      const savedPhone = localStorage.getItem('swatech-driver-phone')
-      const savedAvatar = localStorage.getItem('swatech-driver-avatar')
-      const savedCarBrand = localStorage.getItem('swatech-driver-car-brand')
-      const savedCarColor = localStorage.getItem('swatech-driver-car-color')
-      const savedStreak = localStorage.getItem('swatech-driver-streak')
-      const savedDeliveries = localStorage.getItem('swatech-driver-deliveries')
-      const savedAchievements = localStorage.getItem('swatech-driver-achievements')
+      const savedName = localStorage.getItem('swatworks-driver-name')
+      const savedPhone = localStorage.getItem('swatworks-driver-phone')
+      const savedAvatar = localStorage.getItem('swatworks-driver-avatar')
+      const savedCarBrand = localStorage.getItem('swatworks-driver-car-brand')
+      const savedCarColor = localStorage.getItem('swatworks-driver-car-color')
+      const savedStreak = localStorage.getItem('swatworks-driver-streak')
+      const savedDeliveries = localStorage.getItem('swatworks-driver-deliveries')
+      const savedAchievements = localStorage.getItem('swatworks-driver-achievements')
       
       if (savedName) setDriverName(savedName)
       if (savedPhone) setDriverPhone(savedPhone)
@@ -140,14 +140,14 @@ export default function DriverPage() {
   // Save data when it changes
   useEffect(() => {
     if (typeof window !== 'undefined' && driverName) {
-      localStorage.setItem('swatech-driver-name', driverName)
-      localStorage.setItem('swatech-driver-phone', driverPhone)
-      localStorage.setItem('swatech-driver-avatar', avatar)
-      localStorage.setItem('swatech-driver-car-brand', carBrand)
-      localStorage.setItem('swatech-driver-car-color', carColor)
-      localStorage.setItem('swatech-driver-streak', streak.toString())
-      localStorage.setItem('swatech-driver-deliveries', totalDeliveries.toString())
-      localStorage.setItem('swatech-driver-achievements', JSON.stringify(unlockedAchievements))
+      localStorage.setItem('swatworks-driver-name', driverName)
+      localStorage.setItem('swatworks-driver-phone', driverPhone)
+      localStorage.setItem('swatworks-driver-avatar', avatar)
+      localStorage.setItem('swatworks-driver-car-brand', carBrand)
+      localStorage.setItem('swatworks-driver-car-color', carColor)
+      localStorage.setItem('swatworks-driver-streak', streak.toString())
+      localStorage.setItem('swatworks-driver-deliveries', totalDeliveries.toString())
+      localStorage.setItem('swatworks-driver-achievements', JSON.stringify(unlockedAchievements))
     }
   }, [driverName, driverPhone, avatar, carBrand, carColor, streak, totalDeliveries, unlockedAchievements])
 
@@ -419,7 +419,7 @@ export default function DriverPage() {
               <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/50 flex items-center justify-center mb-4 shadow-lg shadow-primary/25 animate-bounce" style={{ animationDuration: "2s" }}>
                 <Car className="w-10 h-10 text-primary-foreground" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">SWATech Fleet</h1>
+              <h1 className="text-2xl font-bold text-foreground">SwatWorks Fleet</h1>
               <p className="text-muted-foreground text-sm">Driver Tracking App</p>
             </div>
             

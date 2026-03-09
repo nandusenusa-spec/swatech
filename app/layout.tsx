@@ -1,4 +1,4 @@
-// SwatWorks Layout - Cache bust v3
+// SWATWORKS Layout - Cache bust v3
 import type { Metadata, Viewport } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'

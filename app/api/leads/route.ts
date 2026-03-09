@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { redis } from "@/lib/redis"
 
-const LEADS_KEY = "swatech:demo_leads"
+const LEADS_KEY = "swatworks:demo_leads"
 
 export async function POST(request: NextRequest) {
   try {

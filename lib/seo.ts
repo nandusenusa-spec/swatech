@@ -1,8 +1,8 @@
-//  SEO Configuration for SwatWorks
+//  SEO Configuration for SWATWORKS
 // Auto-updates every 48 hours with best practices for Google
 
 export const siteConfig = {
-  name: "SwatWorks",
+  name: "SWATWORKS",
   url: "https://swatech.dev", // Update with your actual domain
   ogImage: "/og-image.jpg",
   description: "Custom digital solutions for businesses in Tampa, FL. From landing pages to fleet tracking systems, we build software that grows with you.",
@@ -37,9 +37,9 @@ export const siteConfig = {
     "CRM development",
     "inventory management system",
   ],
-  authors: [{ name: "SwatWorks", url: "https://swatech.dev" }],
-  creator: "SwatWorks",
-  publisher: "SwatWorks",
+  authors: [{ name: "SWATWORKS", url: "https://swatech.dev" }],
+  creator: "SWATWORKS",
+  publisher: "SWATWORKS",
   formatDetection: {
     email: true,
     address: true,
@@ -47,9 +47,9 @@ export const siteConfig = {
   },
   // Business info for structured data
   business: {
-    name: "SwatWorks",
-    alternateName: "SWAT Works",
-    legalName: "SwatWorks LLC",
+    name: "SWATWORKS",
+    alternateName: "SWAT WORKS",
+    legalName: "SWATWORKS LLC",
     email: "info@swatworks.com",
     telephone: "+1-813-249-1241",
     address: {
@@ -215,7 +215,7 @@ export function generateSoftwareAppSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "SwatWorks Fleet Tracking",
+    name: "SWATWORKS Fleet Tracking",
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web, iOS, Android",
     description: "Real-time fleet tracking and vehicle management system with GPS tracking, delivery status, clock in/out, and driver management.",
@@ -263,7 +263,7 @@ export function generateFAQSchema() {
       answer: "No. All prices shown are before applicable taxes. Depending on your location, state and local sales taxes may apply. You'll see the final amount before confirming."
     },
     {
-      question: "What makes SwatWorks different from other agencies?",
+      question: "What makes SWATWORKS different from other agencies?",
       answer: "We're a boutique agency that intentionally limits our client roster. This means faster response times, higher quality output, and a true partnership rather than being just another account."
     },
   ]
