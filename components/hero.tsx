@@ -4,7 +4,7 @@ import { ArrowRight, Play, Navigation, Mail, Sparkles, Send } from "lucide-react
 import { useEffect, useState, useRef, useCallback } from "react"
 import type { VehicleLocation } from "@/lib/redis"
 
-// Leaflet types for TypeScript
+// Leaflet types for TypeScript (dynamic import to avoid SSR issues)
 type LeafletMap = import("leaflet").Map
 type LeafletMarker = import("leaflet").Marker
 
