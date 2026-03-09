@@ -1,5 +1,6 @@
 "use client"
 
+// SWATech Demo Section - Hero + Inventory demos
 import { useState, useEffect } from "react"
 import { Hero } from "./hero"
 import { InventoryDemo } from "./inventory-demo"
