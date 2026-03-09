@@ -20,7 +20,8 @@ export function LeafletMapComponent({ vehicles }: LeafletMapProps) {
 
   // Initialize map
   useEffect(() => {
-    if (!containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
 
     let isMounted = true
 
@@ -28,14 +29,22 @@ export function LeafletMapComponent({ vehicles }: LeafletMapProps) {
       const L = await import("leaflet")
       await import("leaflet/dist/leaflet.css")
       
-      // Check if component is still mounted and map not already initialized
-      if (!isMounted || !containerRef.current || mapRef.current) return
+      // Check if component is still mounted
+      if (!isMounted || !containerRef.current) return
+      
+      // If map already exists, don't reinitialize
+      if (mapRef.current) return
+      
+      // Check if container already has a map (from HMR or React strict mode)
+      if ((container as HTMLElement & { _leaflet_id?: number })._leaflet_id) {
+        return
+      }
 
       leafletRef.current = L
 
       const defaultCenter: [number, number] = [27.9506, -82.4572]
       
-      mapRef.current = L.map(containerRef.current, {
+      mapRef.current = L.map(container, {
         center: defaultCenter,
         zoom: 12,
         zoomControl: false,
@@ -57,6 +66,9 @@ export function LeafletMapComponent({ vehicles }: LeafletMapProps) {
         mapRef.current.remove()
         mapRef.current = null
       }
+      // Clear markers and trails refs
+      markersRef.current.clear()
+      trailLayersRef.current.clear()
     }
   }, [])
 
