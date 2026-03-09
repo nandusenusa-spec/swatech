@@ -1,9 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
 import type { VehicleLocation } from "@/lib/redis"
+
+// Leaflet types for TypeScript - actual import happens dynamically
+type LeafletMap = import("leaflet").Map
+type LeafletMarker = import("leaflet").Marker
+type LeafletModule = typeof import("leaflet")
 
 interface FleetMapProps {
   vehicles: VehicleLocation[]
@@ -11,8 +14,8 @@ interface FleetMapProps {
   onSelectVehicle: (vehicle: VehicleLocation | null) => void
 }
 
-// Custom car icon SVG
-const createCarIcon = (status: VehicleLocation["status"], heading: number) => {
+// Custom car icon SVG - needs L passed as parameter
+const createCarIcon = (status: VehicleLocation["status"], heading: number, L: LeafletModule) => {
   const color = status === "active" ? "#22c55e" : status === "idle" ? "#eab308" : "#ef4444"
   
   return L.divIcon({
@@ -32,31 +35,41 @@ const createCarIcon = (status: VehicleLocation["status"], heading: number) => {
 }
 
 export default function FleetMap({ vehicles, selectedVehicle, onSelectVehicle }: FleetMapProps) {
-  const mapRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<Map<string, L.Marker>>(new Map())
+  const mapRef = useRef<LeafletMap | null>(null)
+  const markersRef = useRef<Map<string, LeafletMarker>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
+  const leafletRef = useRef<LeafletModule | null>(null)
 
-  // Initialize map
+  // Initialize map with dynamic Leaflet import
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return
 
-    // Default center (Tampa, FL)
-    const defaultCenter: [number, number] = [27.9506, -82.4572]
-    
-    mapRef.current = L.map(containerRef.current, {
-      center: defaultCenter,
-      zoom: 12,
-      zoomControl: false,
-    })
+    const initMap = async () => {
+      // Dynamically import Leaflet (client-side only)
+      const L = await import("leaflet")
+      await import("leaflet/dist/leaflet.css")
+      leafletRef.current = L
 
-    // Add dark tile layer
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 19,
-    }).addTo(mapRef.current)
+      // Default center (Tampa, FL)
+      const defaultCenter: [number, number] = [27.9506, -82.4572]
+      
+      mapRef.current = L.map(containerRef.current!, {
+        center: defaultCenter,
+        zoom: 12,
+        zoomControl: false,
+      })
 
-    // Add zoom control to bottom right
-    L.control.zoom({ position: "bottomright" }).addTo(mapRef.current)
+      // Add dark tile layer
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+      }).addTo(mapRef.current)
+
+      // Add zoom control to bottom right
+      L.control.zoom({ position: "bottomright" }).addTo(mapRef.current)
+    }
+
+    initMap()
 
     return () => {
       if (mapRef.current) {
@@ -68,7 +81,8 @@ export default function FleetMap({ vehicles, selectedVehicle, onSelectVehicle }:
 
   // Update markers when vehicles change
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef.current || !leafletRef.current) return
+    const L = leafletRef.current
 
     const currentVehicleIds = new Set(vehicles.map(v => v.id))
 
@@ -88,11 +102,11 @@ export default function FleetMap({ vehicles, selectedVehicle, onSelectVehicle }:
       if (existingMarker) {
         // Update existing marker
         existingMarker.setLatLng(position)
-        existingMarker.setIcon(createCarIcon(vehicle.status, vehicle.heading))
+        existingMarker.setIcon(createCarIcon(vehicle.status, vehicle.heading, L))
       } else {
         // Create new marker
         const marker = L.marker(position, {
-          icon: createCarIcon(vehicle.status, vehicle.heading),
+          icon: createCarIcon(vehicle.status, vehicle.heading, L),
         })
           .addTo(mapRef.current!)
           .bindPopup(`
@@ -165,9 +179,6 @@ export default function FleetMap({ vehicles, selectedVehicle, onSelectVehicle }:
           background: #1a1a1f !important;
           color: #fff !important;
           border-color: #27272a !important;
-        }
-        .leaflet-control-zoom a:hover {
-          background: #27272a !important;
         }
       `}</style>
     </div>
