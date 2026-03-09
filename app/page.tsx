@@ -1,3 +1,4 @@
+// Main landing page - SWATech
 import { Navbar } from "@/components/navbar"
 import { ScrollNavigation } from "@/components/scroll-navigation"
 import { DemosSection } from "@/components/demos-section"
