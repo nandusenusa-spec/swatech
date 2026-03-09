@@ -86,7 +86,7 @@ function LeadCaptureForm({ onSubmit }: { onSubmit: (email: string, name: string)
         return
       }
 
-      localStorage.setItem("swatech-demo-session", JSON.stringify({ 
+      localStorage.setItem("swatworks-demo-session", JSON.stringify({ 
         email, 
         sessionId: data.sessionId,
         expiresAt: data.expiresAt 
@@ -221,7 +221,7 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
   useEffect(() => {
     if (hasAccess !== undefined) return
     
-    const savedData = localStorage.getItem("swatech-demo-lead")
+    const savedData = localStorage.getItem("swatworks-demo-lead")
     if (savedData) {
       try {
         const { timestamp } = JSON.parse(savedData)
@@ -230,10 +230,10 @@ export function Hero({ onAccessGranted, hasAccess }: HeroProps = {}) {
         if (now - timestamp < hours24) {
           setHasSubmittedLead(true)
         } else {
-          localStorage.removeItem("swatech-demo-lead")
+          localStorage.removeItem("swatworks-demo-lead")
         }
       } catch {
-        localStorage.removeItem("swatech-demo-lead")
+        localStorage.removeItem("swatworks-demo-lead")
       }
     }
   }, [hasAccess])

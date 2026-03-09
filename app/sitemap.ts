@@ -5,7 +5,7 @@ import { MetadataRoute } from 'next'
 // This dynamic sitemap always shows fresh lastModified dates
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://swatech.dev' // Update with your actual domain
+  const baseUrl = 'https://swatworks.dev' // Update with your actual domain
   const currentDate = new Date()
   
   // Update every 48 hours by using modular date

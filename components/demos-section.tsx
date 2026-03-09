@@ -1,6 +1,6 @@
 "use client"
 
-// SWATech Demo Section - Hero + Inventory demos
+// SwatWorks Demo Section - Hero + Inventory demos
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { InventoryDemo } from "./inventory-demo"
@@ -24,7 +24,7 @@ export function DemosSection() {
 
   // Check localStorage for existing access (with 24h expiration)
   useEffect(() => {
-    const savedData = localStorage.getItem("swatech-demo-lead")
+    const savedData = localStorage.getItem("swatworks-demo-lead")
     if (savedData) {
       try {
         const { timestamp, email: savedEmail } = JSON.parse(savedData)
@@ -34,10 +34,10 @@ export function DemosSection() {
           setHasAccess(true)
           setEmail(savedEmail || "")
         } else {
-          localStorage.removeItem("swatech-demo-lead")
+          localStorage.removeItem("swatworks-demo-lead")
         }
       } catch {
-        localStorage.removeItem("swatech-demo-lead")
+        localStorage.removeItem("swatworks-demo-lead")
       }
     }
   }, [])

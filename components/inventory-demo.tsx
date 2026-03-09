@@ -213,7 +213,7 @@ export function InventoryDemo({ hasAccess, onRequestAccess }: InventoryDemoProps
                 <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-yellow-500/80" />
                 <div className="w-2 h-2 md:w-3 md:h-3 rounded-full bg-green-500/80" />
               </div>
-              <span className="text-xs md:text-sm font-medium text-muted-foreground hidden sm:inline">SWATech Inventory Pro</span>
+              <span className="text-xs md:text-sm font-medium text-muted-foreground hidden sm:inline">SwatWorks Inventory Pro</span>
               <span className="text-xs font-medium text-muted-foreground sm:hidden">Inventory</span>
             </div>
             <div className="flex items-center gap-1.5 md:gap-2">

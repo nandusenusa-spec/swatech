@@ -23,7 +23,7 @@ export function ExclusivityBanner() {
             </h2>
 
             <p className="mt-5 max-w-xl text-muted-foreground leading-relaxed">
-              Unlike large agencies that juggle hundreds of accounts, SWATech is a boutique
+              Unlike large agencies that juggle hundreds of accounts, SwatWorks is a boutique
               studio that intentionally limits our client roster. This means your project gets
               our full attention, faster turnaround, and a level of care that bigger firms
               simply cannot match.

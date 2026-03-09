@@ -16,7 +16,7 @@ export function Footer() {
 
           {/* Links */}
           <div className="flex flex-wrap items-center justify-center gap-6">
-            {["Services", "How It Works", "Pricing", "FAQ", "Contact"].map((link) => (
+            {["Services", "How It Works", "FAQ", "Contact"].map((link) => (
               <a
                 key={link}
                 href={`#${link.toLowerCase().replace(/ /g, "-")}`}
